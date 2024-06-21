@@ -30,3 +30,13 @@
 *.exe
 *.out
 *.app
+
+# Build & Debug files
+*.dSYM/
+build/
+bindings/
+cmake-build-debug/
+
+#.DS_Store
+*.DS_Store
+.idea/
