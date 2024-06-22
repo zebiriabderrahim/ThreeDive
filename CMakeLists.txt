@@ -2,9 +2,10 @@ cmake_minimum_required(VERSION 3.15)
 project(ThreeDive C CXX)
 set(CMAKE_CXX_STANDARD 17)
 
-find_package(imgui REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(glad REQUIRED)
+find_package(imgui REQUIRED)
+find_package(spdlog REQUIRED)
 
 add_executable( ThreeDive
         main.cpp
@@ -18,7 +19,7 @@ add_executable( ThreeDive
         bindings/imgui_impl_opengl3.h
         bindings/imgui_impl_opengl3_loader.h
         assets/simple-shader.vs
-        assets/simple-shader.fs )
+        assets/simple-shader.fs debug/debug_info.h)
 
 add_custom_command(TARGET ThreeDive
         POST_BUILD
@@ -27,4 +28,4 @@ add_custom_command(TARGET ThreeDive
         )
 
 target_compile_definitions(ThreeDive PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW)
-target_link_libraries(ThreeDive imgui::imgui glfw glad::glad)
+target_link_libraries(ThreeDive imgui::imgui glfw glad::glad spdlog::spdlog)
