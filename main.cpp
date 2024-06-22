@@ -1,40 +1,16 @@
+#include "glad/glad.h"
+#include <GLFW/glfw3.h>
+#include <spdlog/spdlog.h>
+
 #include "imgui.h"
-#include "../examples2/examples/libraries/imgui/introduction/bindings/imgui_impl_glfw.h"
-#include "../examples2/examples/libraries/imgui/introduction/bindings/imgui_impl_opengl3.h"
+#include "bindings/imgui_impl_glfw.h"
+#include "bindings/imgui_impl_opengl3.h"
 #include "opengl_shader.h"
 #include "file_manager.h"
-#include <stdio.h>
-#include <iostream>
-#include <vector>
-
-#include "glad/glad.h"
-// Include glfw3.h after our OpenGL definitions
-#include <GLFW/glfw3.h>
+#include "debug/debug_info.h"
 
 #define PI 3.14159265358979323846
 
-static void glfw_error_callback(int error, const char *description)
-{
-	fprintf(stderr, "Glfw Error %d: %s\n", error, description);
-}
-
-void render_conan_logo()
-{
-	ImDrawList *draw_list = ImGui::GetWindowDrawList();
-	float sz = 300.0f;
-	static auto col1 = ImVec4(68.0f / 255.0f, 83.0f / 255.0f, 89.0f / 255.0f, 1.0f);
-	static auto col2 = ImVec4(40.0f / 255.0f, 60.0f / 255.0f, 80.0f / 255.0f, 1.0f);
-	static auto col3 = ImVec4(50.0f / 255.0f, 65.0f / 255.0f, 82.0f / 255.0f, 1.0f);
-	static auto col4 = ImVec4(20.0f / 255.0f, 40.0f / 255.0f, 60.0f / 255.0f, 1.0f);
-	const ImVec2 p = ImGui::GetCursorScreenPos();
-	float x = p.x + 4.0f, y = p.y + 4.0f;
-	draw_list->AddQuadFilled(ImVec2(x, y + 0.25 * sz), ImVec2(x + 0.5 * sz, y + 0.5 * sz), ImVec2(x + sz, y + 0.25 * sz), ImVec2(x + 0.5 * sz, y), ImColor(col1));
-	draw_list->AddQuadFilled(ImVec2(x, y + 0.25 * sz), ImVec2(x + 0.5 * sz, y + 0.5 * sz), ImVec2(x + 0.5 * sz, y + 1.0 * sz), ImVec2(x, y + 0.75 * sz), ImColor(col2));
-	draw_list->AddQuadFilled(ImVec2(x + 0.5 * sz, y + 0.5 * sz), ImVec2(x + sz, y + 0.25 * sz), ImVec2(x + sz, y + 0.75 * sz), ImVec2(x + 0.5 * sz, y + 1.0 * sz), ImColor(col3));
-	draw_list->AddLine(ImVec2(x + 0.75 * sz, y + 0.375 * sz), ImVec2(x + 0.75 * sz, y + 0.875 * sz), ImColor(col4));
-    draw_list->AddBezierCubic(ImVec2(x + 0.72 * sz, y + 0.24 * sz), ImVec2(x + 0.68 * sz, y + 0.15 * sz), ImVec2(x + 0.48 * sz, y + 0.13 * sz), ImVec2(x + 0.39 * sz, y + 0.17 * sz), ImColor(col4), 10, 18);
-    draw_list->AddBezierCubic(ImVec2(x + 0.39 * sz, y + 0.17 * sz), ImVec2(x + 0.2 * sz, y + 0.25 * sz), ImVec2(x + 0.3 * sz, y + 0.35 * sz), ImVec2(x + 0.49 * sz, y + 0.38 * sz), ImColor(col4), 10, 18);
-}
 
 void create_triangle(unsigned int &vbo, unsigned int &vao, unsigned int &ebo)
 {
@@ -69,9 +45,11 @@ void create_triangle(unsigned int &vbo, unsigned int &vao, unsigned int &ebo)
 int main(int, char **)
 {
 	// Setup window
-	glfwSetErrorCallback(glfw_error_callback);
-	if (!glfwInit())
+	glfwSetErrorCallback(s3Dive::debug::glfw_error_callback);
+	if (!glfwInit()){
+        spdlog::error("Failed to initialize GLFW");
 		return 1;
+    }
 
 		// Decide GL+GLSL versions
 #if __APPLE__
@@ -89,11 +67,12 @@ int main(int, char **)
 	//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
 	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 #endif
-
 	// Create window with graphics context
-	GLFWwindow *window = glfwCreateWindow(1280, 720, "Dear ImGui - Conan", NULL, NULL);
-	if (window == NULL)
-		return 1;
+	GLFWwindow *window = glfwCreateWindow(1280, 720, "Dear ImGui - Conan", nullptr, NULL);
+	if (window == nullptr){
+        spdlog::error("Failed to create GLFW window");
+        return 1;
+    }
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(1); // Enable vsync
 
@@ -103,13 +82,17 @@ int main(int, char **)
         std::cerr << "Failed to initialize OpenGL context" << std::endl;
         return 1;
     }
+    s3Dive::debug::printGLInfo();
 
-	int screen_width, screen_height;
+	int screen_width;
+    int screen_height;
 	glfwGetFramebufferSize(window, &screen_width, &screen_height);
 	glViewport(0, 0, screen_width, screen_height);
 
 	// create our geometries
-	unsigned int vbo, vao, ebo;
+	unsigned int vbo;
+    unsigned int vao;
+    unsigned int ebo;
 	create_triangle(vbo, vao, ebo);
 
 	// init shader
@@ -159,9 +142,6 @@ int main(int, char **)
         triangle_shader.setUniform("color", color[0], color[1], color[2]);
         ImGui::End();
 
-        ImGui::Begin("Conan logo");
-        render_conan_logo();
-        ImGui::End();
 		// Render dear imgui into screen
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
