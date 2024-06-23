@@ -7,7 +7,7 @@
 #include "bindings/imgui_impl_opengl3.h"
 #include "opengl_shader.h"
 #include "file_manager.h"
-#include "debug/debug_info.h"
+#include "logging//debug_info.h"
 
 #define PI 3.14159265358979323846
 
@@ -79,7 +79,7 @@ int main(int, char **)
 	// Initialize OpenGL loader
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        std::cerr << "Failed to initialize OpenGL context" << std::endl;
+        spdlog::error ("Failed to initialize OpenGL context");
         return 1;
     }
     s3Dive::debug::printGLInfo();

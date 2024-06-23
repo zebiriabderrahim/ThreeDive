@@ -19,7 +19,10 @@ add_executable( ThreeDive
         bindings/imgui_impl_opengl3.h
         bindings/imgui_impl_opengl3_loader.h
         assets/simple-shader.vs
-        assets/simple-shader.fs debug/debug_info.h)
+        assets/simple-shader.fs
+        logging/debug_info.h
+        openGLRender/Shader.cpp
+        openGLRender/Shader.h)
 
 add_custom_command(TARGET ThreeDive
         POST_BUILD
