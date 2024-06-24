@@ -5,17 +5,22 @@
 #include <fstream>
 #include <sstream>
 
-#include "Shader.h"
+#include "shader.h"
 
 
 namespace s3Dive {
 
     Shader::Shader(GLenum type, const std::string &filepath) {
         shaderId_ = glCreateShader(type);
-        const char *src = filepath.c_str();
+        const std::string& source = loadShaderFile(filepath);
+        const char *src = source.c_str();
         glShaderSource(shaderId_, 1, &src, nullptr);
         glCompileShader(shaderId_);
         checkShaderError();
+    }
+
+    Shader::~Shader() {
+        glDeleteShader(shaderId_);
     }
 
     GLuint Shader::getShaderId() const {
@@ -38,11 +43,11 @@ namespace s3Dive {
     }
 
 
-    std::string Shader::loadShaderFile(const std::string &filepath) {
+    std::string Shader::loadShaderFile(std::string_view filepath) {
         try {
             std::ifstream stream(filepath);
             if (!stream.is_open()) {
-                throw std::ifstream::failure("Failed to open file: " + filepath);
+                throw std::ifstream::failure("Failed to open file: " + std::string(filepath));
             }
             std::stringstream ss;
             ss << stream.rdbuf();
@@ -52,4 +57,6 @@ namespace s3Dive {
             return "";
         }
     }
+
+
 } // s3Dive

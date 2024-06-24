@@ -18,16 +18,16 @@ add_executable( ThreeDive
         bindings/imgui_impl_opengl3.cpp
         bindings/imgui_impl_opengl3.h
         bindings/imgui_impl_opengl3_loader.h
-        assets/simple-shader.vs
-        assets/simple-shader.fs
+        assets/simple-shader.vs.glsl
+        assets/simple-shader.fs.glsl
         logging/debug_info.h
-        openGLRender/Shader.cpp
-        openGLRender/Shader.h)
+        openGLRender/shader.cpp
+        openGLRender/shader.h openGLRender/shader_program.cpp openGLRender/shader_program.h)
 
 add_custom_command(TARGET ThreeDive
         POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/assets/simple-shader.vs $<TARGET_FILE_DIR:ThreeDive>
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/assets/simple-shader.fs $<TARGET_FILE_DIR:ThreeDive>
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/assets/simple-shader.vs.glsl $<TARGET_FILE_DIR:ThreeDive>
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/assets/simple-shader.fs.glsl $<TARGET_FILE_DIR:ThreeDive>
         )
 
 target_compile_definitions(ThreeDive PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW)

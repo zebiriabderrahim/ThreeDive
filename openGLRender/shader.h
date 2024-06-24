@@ -13,9 +13,10 @@ namespace s3Dive {
     class Shader {
     public:
         Shader(GLenum type, const std::string& code);
+        ~Shader();
 
         [[nodiscard]] GLuint getShaderId() const;
-        [[nodiscard]] static std::string loadShaderFile(const std::string& filepath) ;
+        [[nodiscard]] static std::string loadShaderFile(std::string_view filepath) ;
 
     private:
         void checkShaderError() const;

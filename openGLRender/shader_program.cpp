@@ -2,7 +2,6 @@
 // Created by ABDERRAHIM ZEBIRI on 2024-06-24.
 //
 #include <spdlog/spdlog.h>
-#include <sstream>
 #include "shader_program.h"
 
 namespace s3Dive {
