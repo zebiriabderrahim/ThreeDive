@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <fstream>
 
-#include "../openGLRender/Shader.h"
+#include "../openGLRender/shader.h"
 
 
 using namespace s3Dive;

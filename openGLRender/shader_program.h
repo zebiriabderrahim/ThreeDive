@@ -23,8 +23,6 @@ namespace s3Dive {
 
         void use() const;
         static void unuse() ;
-        void link() const;
-        void attachShader(const Shader& shader) const;
 
         [[nodiscard]] GLint getAttribLocation(std::string_view name, bool verbose = true);
         [[nodiscard]] GLint getUniformLocation(std::string_view name);
@@ -37,6 +35,8 @@ namespace s3Dive {
 
     private:
         void checkLinkingErr() const;
+        void link() const;
+        void attachShader(const Shader& shader) const;
 
         GLuint programId_;
         std::unordered_map<std::string, GLint> uniformLocationCache_;

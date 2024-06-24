@@ -2,7 +2,6 @@
 // Created by ABDERRAHIM ZEBIRI on 2024-06-24.
 //
 #include <spdlog/spdlog.h>
-#include <sstream>
 #include "shader_program.h"
 
 namespace s3Dive {
@@ -37,7 +36,6 @@ namespace s3Dive {
         attachShader(fragmentShader);
 
         link();
-
     }
 
     void ShaderProgram::use() const {
@@ -55,8 +53,6 @@ namespace s3Dive {
 
     void ShaderProgram::attachShader(const Shader& shader) const{
         glAttachShader(programId_, shader.getShaderId());
-        link();
-        glDeleteShader(shader.getShaderId());
     }
 
     GLint ShaderProgram::getAttribLocation(std::string_view name, bool verbose)  {
