@@ -1,14 +1,13 @@
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
 #include <spdlog/spdlog.h>
+#include <cmath>
 
 #include "imgui.h"
 #include "bindings/imgui_impl_glfw.h"
 #include "bindings/imgui_impl_opengl3.h"
 #include "logging/debug_info.h"
 #include "openGLRender/shader_program.h"
-
-const float PI = 3.14159265358979323846f;
 
 
 void create_triangle(unsigned int &vbo, unsigned int &vao, unsigned int &ebo)
@@ -100,7 +99,7 @@ int main(int, char **)
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
-    [[maybe_unused]] ImGuiIO &io = ImGui::GetIO();
+    [[maybe_unused]] ImGuiIO const &io = ImGui::GetIO();
 	// Setup Platform/Renderer bindings
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init(glsl_version);
@@ -127,7 +126,7 @@ int main(int, char **)
 		// render your GUI
 		ImGui::Begin("Triangle Position/Color");
 		static float rotation = 0.0;
-		ImGui::SliderFloat("rotation", &rotation, 0, 2 * PI);
+		ImGui::SliderFloat("rotation", &rotation, 0, 2 * (float)M_PI);
 		static float translation[] = {0.0, 0.0};
 		ImGui::SliderFloat2("position", translation, -1.0, 1.0);
         static float color[4] = { 1.0f,1.0f,1.0f,1.0f };

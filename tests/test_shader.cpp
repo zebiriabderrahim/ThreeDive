@@ -35,33 +35,28 @@ TEST(ShaderTest, LoadShaderFileSuccess) {
 
     EXPECT_EQ(result, testShaderCode);
 
-    std::remove(testFilePath.c_str());
+    if (std::remove(testFilePath.c_str()) != 0) {
+        std::cerr << "Error deleting file: " << testFilePath << std::endl;
+    }
 }
 
 TEST(ShaderTest, LoadShaderFileEmpty) {
-    // Create an empty file
     const std::string testFilePath = "empty_shader.glsl";
     std::ofstream outFile(testFilePath);
     outFile.close();
 
-    // Attempt to load the empty file and expect an empty string as the result
     std::string result = Shader::loadShaderFile(testFilePath);
     EXPECT_EQ(result, "");
 
-    // Remove the empty file
-    std::remove(testFilePath.c_str());
+    if (std::remove(testFilePath.c_str()) != 0) {
+        std::cerr << "Error deleting file: " << testFilePath << std::endl;
+    }
 }
 
 TEST(ShaderTest, LoadShaderFileFailure) {
-    // Attempt to load a non-existing file and expect an empty string as the result
-    std::string result;
-    try {
-        result = Shader::loadShaderFile("non_existing_file.glsl");
-    } catch (const std::ifstream::failure& e) {
-        FAIL() << "Unexpected exception thrown: " << e.what();
-    }
 
-    // Ensure that the result is an empty string
+    auto result = Shader::loadShaderFile("non_existing_file.glsl");
+
     EXPECT_EQ(result, "");
 }
 
