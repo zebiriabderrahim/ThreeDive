@@ -1,15 +1,13 @@
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
 #include <spdlog/spdlog.h>
+#include <cmath>
 
 #include "imgui.h"
 #include "bindings/imgui_impl_glfw.h"
 #include "bindings/imgui_impl_opengl3.h"
-#include "opengl_shader.h"
-#include "file_manager.h"
-#include "debug/debug_info.h"
-
-#define PI 3.14159265358979323846
+#include "logging/debug_info.h"
+#include "openGLRender/shader_program.h"
 
 
 void create_triangle(unsigned int &vbo, unsigned int &vao, unsigned int &ebo)
@@ -34,7 +32,7 @@ void create_triangle(unsigned int &vbo, unsigned int &vao, unsigned int &ebo)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(triangle_vertices), triangle_vertices, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(triangle_indices), triangle_indices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) nullptr);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
@@ -68,7 +66,7 @@ int main(int, char **)
 	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 #endif
 	// Create window with graphics context
-	GLFWwindow *window = glfwCreateWindow(1280, 720, "Dear ImGui - Conan", nullptr, NULL);
+	GLFWwindow *window = glfwCreateWindow(1280, 720, "Dear ImGui - Conan", nullptr, nullptr);
 	if (window == nullptr){
         spdlog::error("Failed to create GLFW window");
         return 1;
@@ -79,7 +77,7 @@ int main(int, char **)
 	// Initialize OpenGL loader
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        std::cerr << "Failed to initialize OpenGL context" << std::endl;
+        spdlog::error ("Failed to initialize OpenGL context");
         return 1;
     }
     s3Dive::debug::printGLInfo();
@@ -96,13 +94,12 @@ int main(int, char **)
 	create_triangle(vbo, vao, ebo);
 
 	// init shader
-	Shader triangle_shader;
-	triangle_shader.init(FileManager::read("simple-shader.vs"), FileManager::read("simple-shader.fs"));
-
+    s3Dive::ShaderProgram triangle_shader;
+    triangle_shader.initFromFiles("simple-shader.vs.glsl", "simple-shader.fs.glsl");
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
-	ImGuiIO &io = ImGui::GetIO();
+    [[maybe_unused]] ImGuiIO const &io = ImGui::GetIO();
 	// Setup Platform/Renderer bindings
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init(glsl_version);
@@ -123,13 +120,13 @@ int main(int, char **)
 		// rendering our geometries
 		triangle_shader.use();
 		glBindVertexArray(vao);
-		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
 		glBindVertexArray(0);
 
 		// render your GUI
 		ImGui::Begin("Triangle Position/Color");
 		static float rotation = 0.0;
-		ImGui::SliderFloat("rotation", &rotation, 0, 2 * PI);
+		ImGui::SliderFloat("rotation", &rotation, 0, 2 * (float)M_PI);
 		static float translation[] = {0.0, 0.0};
 		ImGui::SliderFloat2("position", translation, -1.0, 1.0);
         static float color[4] = { 1.0f,1.0f,1.0f,1.0f };
@@ -146,7 +143,8 @@ int main(int, char **)
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-		int display_w, display_h;
+		int display_w;
+        int display_h;
 		glfwGetFramebufferSize(window, &display_w, &display_h);
 		glViewport(0, 0, display_w, display_h);
 		glfwSwapBuffers(window);
