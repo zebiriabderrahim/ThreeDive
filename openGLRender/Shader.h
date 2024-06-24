@@ -4,6 +4,7 @@
 
 #ifndef THREEDIVE_SHADER_H
 #define THREEDIVE_SHADER_H
+
 #include <glad/glad.h>
 #include <string>
 
@@ -14,10 +15,10 @@ namespace s3Dive {
         Shader(GLenum type, const std::string& code);
 
         [[nodiscard]] GLuint getShaderId() const;
+        [[nodiscard]] static std::string loadShaderFile(const std::string& filepath) ;
 
     private:
         void checkShaderError() const;
-        [[nodiscard]] static std::string loadShaderFile(const std::string& filepath) ;
         GLuint shaderId_;
     };
 
