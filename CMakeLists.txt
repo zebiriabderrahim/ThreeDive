@@ -32,3 +32,6 @@ add_custom_command(TARGET ThreeDive
 
 target_compile_definitions(ThreeDive PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW)
 target_link_libraries(ThreeDive imgui::imgui glfw glad::glad spdlog::spdlog)
+
+add_subdirectory(tests)
+
