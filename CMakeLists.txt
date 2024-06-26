@@ -26,7 +26,9 @@ add_executable(ThreeDive
         openGLRender/gl_vertex_buffer_layout.cpp
         openGLRender/gl_vertex_buffer_layout.h
         openGLRender/gl_vertex_buffer.cpp
-        openGLRender/gl_vertex_buffer.h)
+        openGLRender/gl_vertex_buffer.h
+        openGLRender/gl_index_buffer.cpp
+        openGLRender/gl_index_buffer.h)
 
 add_custom_command(TARGET ThreeDive
         POST_BUILD

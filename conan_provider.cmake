@@ -25,16 +25,28 @@
 
 set(CONAN_MINIMUM_VERSION 2.0.5)
 
+# Create a new policy scope and set the minimum required cmake version so the
+# features behind a policy setting like if(... IN_LIST ...) behaves as expected
+# even if the parent project does not specify a minimum cmake version or a minimum
+# version less than this module requires (e.g. 3.0) before the first project() call.
+# (see: https://cmake.org/cmake/help/latest/variable/CMAKE_PROJECT_TOP_LEVEL_INCLUDES.html)
+#
+# The policy-affecting calls like cmake_policy(SET...) or `cmake_minimum_required` only
+# affects the current policy scope, i.e. between the PUSH and POP in this case.
+#
+# https://cmake.org/cmake/help/book/mastering-cmake/chapter/Policies.html#the-policy-stack
+cmake_policy(PUSH)
+cmake_minimum_required(VERSION 3.24)
 
 function(detect_os OS OS_API_LEVEL OS_SDK OS_SUBSYSTEM OS_VERSION)
     # it could be cross compilation
     message(STATUS "CMake-Conan: cmake_system_name=${CMAKE_SYSTEM_NAME}")
-    if(CMAKE_SYSTEM_NAME AND NOT CMAKE_SYSTEM_NAME STREQUAL "Generic")
-        if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    if (CMAKE_SYSTEM_NAME AND NOT CMAKE_SYSTEM_NAME STREQUAL "Generic")
+        if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
             set(${OS} Macos PARENT_SCOPE)
-        elseif(CMAKE_SYSTEM_NAME STREQUAL "QNX")
+        elseif (CMAKE_SYSTEM_NAME STREQUAL "QNX")
             set(${OS} Neutrino PARENT_SCOPE)
-        elseif(CMAKE_SYSTEM_NAME STREQUAL "CYGWIN")
+        elseif (CMAKE_SYSTEM_NAME STREQUAL "CYGWIN")
             set(${OS} Windows PARENT_SCOPE)
             set(${OS_SUBSYSTEM} cygwin PARENT_SCOPE)
         elseif(CMAKE_SYSTEM_NAME MATCHES "^MSYS")
@@ -249,7 +261,7 @@ function(detect_compiler COMPILER COMPILER_VERSION COMPILER_RUNTIME COMPILER_RUN
             if(_msvc_runtime_library MATCHES "Debug")
                 set(_COMPILER_RUNTIME_TYPE "Debug")
             else()
-                set(_COMPILER_RUNTIME_TYPE "Release")
+                set(_COMPILER_RUNTIME_TYPE "build/Release")
             endif()
             message(STATUS "CMake-Conan: CMake compiler.runtime_type=${_COMPILER_RUNTIME_TYPE}")
         endif()
@@ -650,3 +662,5 @@ if(NOT _cmake_program)
     get_filename_component(PATH_TO_CMAKE_BIN "${CMAKE_COMMAND}" DIRECTORY)
     set(PATH_TO_CMAKE_BIN "${PATH_TO_CMAKE_BIN}" CACHE INTERNAL "Path where the CMake executable is")
 endif()
+
+cmake_policy(POP)
