@@ -1,9 +1,11 @@
 //
 // Created by ABDERRAHIM ZEBIRI on 2024-06-22.
 //
-#include <spdlog/spdlog.h>
 #include <fstream>
 #include <sstream>
+#include <string>
+#include <glad/glad.h>
+#include <spdlog/spdlog.h>
 
 #include "shader.h"
 

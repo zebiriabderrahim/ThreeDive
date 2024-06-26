@@ -5,8 +5,6 @@
 #ifndef THREEDIVE_SHADER_PROGRAM_H
 #define THREEDIVE_SHADER_PROGRAM_H
 
-#include <glad/glad.h>
-
 #include "shader.h"
 
 
