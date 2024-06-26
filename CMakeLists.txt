@@ -7,7 +7,7 @@ find_package(glad REQUIRED)
 find_package(imgui REQUIRED)
 find_package(spdlog REQUIRED)
 
-add_executable( ThreeDive
+add_executable(ThreeDive
         main.cpp
         bindings/imgui_impl_glfw.cpp
         bindings/imgui_impl_glfw.h
@@ -18,7 +18,15 @@ add_executable( ThreeDive
         assets/simple-shader.fs.glsl
         logging/debug_info.h
         openGLRender/shader.cpp
-        openGLRender/shader.h openGLRender/shader_program.cpp openGLRender/shader_program.h)
+        openGLRender/shader.h
+        openGLRender/shader_program.cpp
+        openGLRender/shader_program.h
+        openGLRender/gl_vertex_array.cpp
+        openGLRender/gl_vertex_array.h
+        openGLRender/gl_vertex_buffer_layout.cpp
+        openGLRender/gl_vertex_buffer_layout.h
+        openGLRender/gl_vertex_buffer.cpp
+        openGLRender/gl_vertex_buffer.h)
 
 add_custom_command(TARGET ThreeDive
         POST_BUILD
