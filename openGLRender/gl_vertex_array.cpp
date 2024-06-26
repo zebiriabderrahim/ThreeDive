@@ -5,6 +5,7 @@
 
 #include "gl_vertex_array.h"
 #include "gl_vertex_buffer.h"
+#include "gl_index_buffer.h"
 #include "gl_vertex_buffer_layout.h"
 
 
@@ -27,13 +28,18 @@ namespace s3Dive {
         const auto stride = layout.getStride();
 
         for (unsigned int i = 0; i < elements.size(); ++i) {
-            const auto& element = elements[i];
+            const auto &element = elements[i];
 
             glEnableVertexAttribArray(i);
             glVertexAttribPointer(i, element.count, element.type, element.isNormalized, stride,
-                                  (const void *)(uintptr_t)(offset));
+                                  (const void *) (uintptr_t) (offset));
             offset += element.count * VertexBufferElement::getSizeOfType(element.type);
         }
+    }
+
+    void GLVertexArray::setIndexBuffer(const GLIndexBuffer &ibo) const {
+        bind();
+        ibo.bind();
     }
 
     void GLVertexArray::bind() const {
@@ -43,4 +49,6 @@ namespace s3Dive {
     void GLVertexArray::unbind() const {
         glBindVertexArray(0);
     }
+
+
 } // s3Dive

@@ -9,6 +9,9 @@
 namespace s3Dive {
 
     class GLVertexBuffer;
+
+    class GLIndexBuffer;
+
     class GLVertexBufferLayout;
 
     class GLVertexArray {
@@ -17,6 +20,8 @@ namespace s3Dive {
         ~GLVertexArray();
 
         void addBufferArray(const GLVertexBuffer &vbo, const GLVertexBufferLayout &layout) const;
+
+        void setIndexBuffer(const GLIndexBuffer &ibo) const;
 
         void bind() const;
         void unbind() const;
