@@ -85,7 +85,7 @@ int main(int, char **) {
     vao.setIndexBuffer(ibo);
     // texture .jpg is in the root you need to back for cmake-build-debug
 
-    s3Dive::GLTexture tex("../wall.jpg");
+    s3Dive::GLTexture tex("wall.jpg");
 
 
 
