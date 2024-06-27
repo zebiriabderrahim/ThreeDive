@@ -6,17 +6,18 @@
 #define THREEDIVE_SHADER_H
 
 #include <glad/glad.h>
-#include <string>
 
 namespace s3Dive {
 
     class Shader {
     public:
-        Shader(GLenum type, const std::string& code);
+        Shader(GLenum type, const std::string &code);
+
         ~Shader();
 
         [[nodiscard]] GLuint getShaderId() const;
-        [[nodiscard]] static std::string loadShaderFile(std::string_view filepath) ;
+
+        [[nodiscard]] static std::string loadShaderFile(std::string_view filepath);
 
     private:
         void checkShaderError() const;

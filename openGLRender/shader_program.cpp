@@ -1,6 +1,7 @@
 //
 // Created by ABDERRAHIM ZEBIRI on 2024-06-24.
 //
+#include <glad/glad.h>
 #include <spdlog/spdlog.h>
 #include "shader_program.h"
 

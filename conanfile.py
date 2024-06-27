@@ -1,13 +1,15 @@
 import os
-
 from conan import ConanFile
-from conan.tools.cmake import cmake_layout
+from conan.tools.cmake import CMake, cmake_layout
 from conan.tools.files import copy
 
 
-class ImGuiExample(ConanFile):
+class ThreeDive(ConanFile):
+    name = "ThreeDive"
+    version = "1.0"
     settings = "os", "compiler", "build_type", "arch"
     generators = "CMakeDeps", "CMakeToolchain"
+    tool_requires = "cmake/3.22.6"
 
     def requirements(self):
         requirements = self.conan_data.get('requirements', [])
@@ -15,10 +17,15 @@ class ImGuiExample(ConanFile):
             self.requires(requirement)
 
     def generate(self):
-        copy(self, "*glfw*", os.path.join(self.dependencies["imgui"].package_folder,"res", "bindings"),
-             os.path.join(self.source_folder, "bindings"))
-        copy(self, "*opengl3*", os.path.join(self.dependencies["imgui"].package_folder,"res", "bindings"),
-             os.path.join(self.source_folder, "bindings"))
+        for binding in ["*glfw*", "*opengl3*"]:
+            copy(self, binding,
+                 os.path.join(self.dependencies["imgui"].package_folder, "res", "bindings"),
+                 os.path.join(self.source_folder, "bindings"))
 
     def layout(self):
         cmake_layout(self)
+
+    def build(self):
+        cmake = CMake(self)
+        cmake.configure()
+        cmake.build()
