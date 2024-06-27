@@ -2,6 +2,7 @@
 # To keep your changes, remove these comment lines, but the plugin won't be able to modify your requirements
 
 requirements:
+  - "stb/cci.20240213"
   - "glad/0.1.36"
   - "glfw/3.3.8"
   - "imgui/1.90.8-docking"

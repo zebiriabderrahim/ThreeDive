@@ -6,6 +6,7 @@ find_package(glfw3 REQUIRED)
 find_package(glad REQUIRED)
 find_package(imgui REQUIRED)
 find_package(spdlog REQUIRED)
+find_package(stb REQUIRED)
 
 add_executable(ThreeDive
         main.cpp
@@ -28,7 +29,9 @@ add_executable(ThreeDive
         openGLRender/gl_vertex_buffer.cpp
         openGLRender/gl_vertex_buffer.h
         openGLRender/gl_index_buffer.cpp
-        openGLRender/gl_index_buffer.h)
+        openGLRender/gl_index_buffer.h
+        openGLRender/gl_texture.cpp
+        openGLRender/gl_texture.h)
 
 add_custom_command(TARGET ThreeDive
         POST_BUILD
@@ -37,7 +40,7 @@ add_custom_command(TARGET ThreeDive
         )
 
 target_compile_definitions(ThreeDive PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW)
-target_link_libraries(ThreeDive imgui::imgui glfw glad::glad spdlog::spdlog)
+target_link_libraries(ThreeDive imgui::imgui glfw glad::glad spdlog::spdlog stb::stb)
 
 add_subdirectory(tests)
 
