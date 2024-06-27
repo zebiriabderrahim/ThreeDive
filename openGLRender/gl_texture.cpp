@@ -16,7 +16,8 @@ namespace s3Dive {
         stbi_set_flip_vertically_on_load(1);
 
         localBuffer_ = stbi_load(path.data(), &width_, &height_, &BPP_, 4);
-        if (!localBuffer_) {
+        auto isBufferLoaded = static_cast<bool>(localBuffer_);
+        if (!isBufferLoaded) {
             spdlog::error("Failed to load texture: {}", path);
         }
 
@@ -40,7 +41,7 @@ namespace s3Dive {
 
         unbind();
 
-        if (localBuffer_) {
+        if (isBufferLoaded) {
             stbi_image_free(localBuffer_);
         }
     }
