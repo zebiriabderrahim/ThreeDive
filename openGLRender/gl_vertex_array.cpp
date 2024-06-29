@@ -1,11 +1,10 @@
 //
 // Created by ABDERRAHIM ZEBIRI on 2024-06-24.
 //
+
 #include <glad/glad.h>
 
 #include "gl_vertex_array.h"
-#include "gl_vertex_buffer.h"
-#include "gl_index_buffer.h"
 #include "gl_vertex_buffer_layout.h"
 
 
@@ -19,13 +18,13 @@ namespace s3Dive {
         glDeleteVertexArrays(1, &rendererID_);
     }
 
-    void GLVertexArray::addBufferArray(const GLVertexBuffer &vbo, const GLVertexBufferLayout &layout) const {
+    void GLVertexArray::addVertexBuffer(const VertexBufferObjectRef &vbo) {
         bind();
-        vbo.bind();
+        vbo->bind();
 
-        const auto& elements = layout.getElements();
+        const auto &elements = vbo->getLayout().getElements();
         unsigned int offset = 0;
-        const auto stride = layout.getStride();
+        const auto stride = vbo->getLayout().getStride();
 
         for (unsigned int i = 0; i < elements.size(); ++i) {
             const auto &element = elements[i];
@@ -35,11 +34,8 @@ namespace s3Dive {
                                   (const void *) (uintptr_t) (offset));
             offset += element.count * VertexBufferElement::getSizeOfType(element.type);
         }
-    }
+        vertexBuffers_.push_back(vbo);
 
-    void GLVertexArray::setIndexBuffer(const GLIndexBuffer &ibo) const {
-        bind();
-        ibo.bind();
     }
 
     void GLVertexArray::bind() const {
@@ -48,6 +44,13 @@ namespace s3Dive {
 
     void GLVertexArray::unbind() const {
         glBindVertexArray(0);
+    }
+
+
+    void GLVertexArray::setIndexBuffer(const IndexBufferObjectRef &ibo) {
+        bind();
+        ibo->bind();
+        indexBuffer_ = ibo;
     }
 
 

@@ -25,4 +25,13 @@ namespace s3Dive {
     void GLVertexBuffer::unbind() const {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
+
+    void GLVertexBuffer::setLayout(const GLVertexBufferLayout &layout) {
+        layout_ = layout;
+    }
+
+    GLVertexBufferLayout &GLVertexBuffer::getLayout() {
+        return layout_;
+    }
+
 } // s3Dive
