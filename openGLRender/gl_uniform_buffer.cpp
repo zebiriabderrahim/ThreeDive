@@ -4,7 +4,7 @@
 #include <vector>
 #include "glad/glad.h"
 
-#include "GLUniFormBuffer.h"
+#include "gl_uniform_buffer.h"
 
 namespace s3Dive {
 

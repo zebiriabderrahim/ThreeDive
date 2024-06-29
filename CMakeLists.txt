@@ -20,8 +20,8 @@ add_executable(ThreeDive
         logging/debug_info.h
         openGLRender/shader.cpp
         openGLRender/shader.h
-        openGLRender/shader_program.cpp
-        openGLRender/shader_program.h
+        openGLRender/gl_shader_program.cpp
+        openGLRender/gl_shader_program.h
         openGLRender/gl_vertex_array.cpp
         openGLRender/gl_vertex_array.h
         openGLRender/gl_vertex_buffer_layout.cpp
@@ -31,7 +31,9 @@ add_executable(ThreeDive
         openGLRender/gl_index_buffer.cpp
         openGLRender/gl_index_buffer.h
         openGLRender/gl_texture.cpp
-        openGLRender/gl_texture.h)
+        openGLRender/gl_texture.h
+        openGLRender/gl_uniform_buffer.cpp
+        openGLRender/gl_uniform_buffer.h)
 
 add_custom_command(TARGET ThreeDive
         POST_BUILD
