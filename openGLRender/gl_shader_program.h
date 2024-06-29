@@ -2,46 +2,54 @@
 // Created by ABDERRAHIM ZEBIRI on 2024-06-24.
 //
 
-#ifndef THREEDIVE_SHADER_PROGRAM_H
-#define THREEDIVE_SHADER_PROGRAM_H
+#ifndef THREEDIVE_GL_SHADER_PROGRAM_H
+#define THREEDIVE_GL_SHADER_PROGRAM_H
 
 #include "shader.h"
 
 
 namespace s3Dive {
 
-    class ShaderProgram {
+    class GLShaderProgram {
 
     public:
-        ShaderProgram();
-        ~ShaderProgram();
+        GLShaderProgram();
+
+        ~GLShaderProgram();
 
         void initFromFiles(std::string_view vsPath, std::string_view fsPath) const;
+
         void initFromFiles(std::string_view vsPath, std::string_view gsPath, std::string_view fsPath) const;
 
         void use() const;
-        static void unuse() ;
+
+        void unuse() const;
 
         [[nodiscard]] GLint getAttribLocation(std::string_view name, bool verbose = true);
+
         [[nodiscard]] GLint getUniformLocation(std::string_view name);
 
-        template<typename T> void setUniform(const std::string& name, T val);
-        template<typename T> void setUniform(const std::string& name, T val1, T val2);
-        template<typename T> void setUniform(const std::string& name, T val1, T val2, T val3);
+        template<typename T>
+        void updateShaderUniform(std::string_view name, T val);
 
+        template<typename T>
+        void updateShaderUniform(std::string_view name, T val1, T val2);
 
+        template<typename T>
+        void updateShaderUniform(std::string_view name, T val1, T val2, T val3);
 
     private:
         void checkLinkingErr() const;
+
         void link() const;
-        void attachShader(const Shader& shader) const;
+
+        void attachShader(const Shader &shader) const;
 
         GLuint programId_;
         std::unordered_map<std::string, GLint> uniformLocationCache_;
         std::unordered_map<std::string, GLint> attribLocationCache_;
-
     };
 
 } // s3Dive
 
-#endif //THREEDIVE_SHADER_PROGRAM_H
+#endif //THREEDIVE_GL_SHADER_PROGRAM_H
