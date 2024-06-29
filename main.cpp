@@ -7,7 +7,7 @@
 #include "bindings/imgui_impl_glfw.h"
 #include "bindings/imgui_impl_opengl3.h"
 #include "logging/debug_info.h"
-#include "openGLRender/shader_program.h"
+#include "openGLRender/gl_shader_program.h"
 #include "openGLRender/gl_vertex_array.h"
 #include "openGLRender/gl_vertex_buffer.h"
 #include "openGLRender/gl_index_buffer.h"
@@ -90,7 +90,7 @@ int main(int, char **) {
 
 
     // init shader
-    s3Dive::ShaderProgram triangle_shader;
+    s3Dive::GLShaderProgram triangle_shader;
     triangle_shader.initFromFiles("simple-shader.vs.glsl", "simple-shader.fs.glsl");
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -127,12 +127,12 @@ int main(int, char **) {
         ImGui::SliderFloat2("position", translation, -1.0, 1.0);
         static float color[4] = {1.0f, 1.0f, 1.0f, 1.0f};
         // pass the parameters to the shader
-        triangle_shader.setUniform("rotation", rotation);
-        triangle_shader.setUniform("translation", translation[0], translation[1]);
+        triangle_shader.updateShaderUniform("rotation", rotation);
+        triangle_shader.updateShaderUniform("translation", translation[0], translation[1]);
         // color picker
         ImGui::ColorEdit3("color", color);
         // multiply triangle's color with this color
-        triangle_shader.setUniform("color", color[0], color[1], color[2]);
+        triangle_shader.updateShaderUniform("color", color[0], color[1], color[2]);
         ImGui::End();
 
         // Render dear imgui into screen
