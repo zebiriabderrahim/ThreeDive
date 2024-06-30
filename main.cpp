@@ -1,87 +1,173 @@
-#include "glad/glad.h"
 #include <GLFW/glfw3.h>
 #include <spdlog/spdlog.h>
-#include <cmath>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "imgui.h"
 #include "bindings/imgui_impl_glfw.h"
 #include "bindings/imgui_impl_opengl3.h"
-#include "logging/debug_info.h"
 #include "openGLRender/gl_shader_program.h"
 #include "openGLRender/gl_vertex_array.h"
 #include "openGLRender/gl_vertex_buffer.h"
 #include "openGLRender/gl_index_buffer.h"
 #include "openGLRender/gl_vertex_buffer_layout.h"
 #include "openGLRender/gl_texture.h"
+#include "openGLRender/gl_context.h"
+#include "openGLRender/gl_renderer.h"
+#include <vector>
+#include <cmath>
+
+std::vector<float> generateNormalizedSphereVertices(int sectorCount, int stackCount) {
+    std::vector<float> vertices;
+    float radius = 1.0f; // Unit sphere
+
+    for (int i = 0; i <= stackCount; ++i) {
+        float stackAngle = glm::pi<float>() / 2 - i * glm::pi<float>() / stackCount; // from pi/2 to -pi/2
+        float xy = radius * cosf(stackAngle);             // r * cos(u)
+        float z = radius * sinf(stackAngle);              // r * sin(u)
+
+        for (int j = 0; j <= sectorCount; ++j) {
+            float sectorAngle = j * 2 * glm::pi<float>() / sectorCount; // from 0 to 2pi
+
+            float x = xy * cosf(sectorAngle);             // r * cos(u) * cos(v)
+            float y = xy * sinf(sectorAngle);             // r * cos(u) * sin(v)
+
+            vertices.push_back(x);
+            vertices.push_back(y);
+            vertices.push_back(z);
+
+            // Texture coordinates
+            float s = (float) j / sectorCount;
+            float t = (float) i / stackCount;
+            vertices.push_back(s);
+            vertices.push_back(t);
+        }
+    }
+
+    return vertices;
+}
+
+// Function to generate sphere indices
+std::vector<unsigned int> generateSphereIndices(int sectorCount, int stackCount) {
+    std::vector<unsigned int> indices;
+    for (int i = 0; i < stackCount; ++i) {
+        int k1 = i * (sectorCount + 1);     // beginning of current stack
+        int k2 = k1 + sectorCount + 1;      // beginning of next stack
+
+        for (int j = 0; j < sectorCount; ++j, ++k1, ++k2) {
+            if (i != 0) {
+                indices.push_back(k1);
+                indices.push_back(k2);
+                indices.push_back(k1 + 1);
+            }
+
+            if (i != (stackCount - 1)) {
+                indices.push_back(k1 + 1);
+                indices.push_back(k2);
+                indices.push_back(k2 + 1);
+            }
+        }
+    }
+
+    return indices;
+}
 
 
 int main(int, char **) {
-    // Setup window
-    glfwSetErrorCallback(s3Dive::debug::glfw_error_callback);
-    if (!glfwInit()) {
-        spdlog::error("Failed to initialize GLFW");
-        return 1;
-    }
-
-    // Decide GL+GLSL versions
-#if __APPLE__
-    // GL 3.2 + GLSL 150
     const char *glsl_version = "#version 150";
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // 3.2+ only
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);           // Required on Mac
-#else
-    // GL 3.0 + GLSL 130
-    const char *glsl_version = "#version 130";
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
-    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
-#endif
+    s3Dive::GLRenderer renderer;
+    renderer.init();
     // Create window with graphics context
     GLFWwindow *window = glfwCreateWindow(1280, 720, "Dear ImGui - Conan", nullptr, nullptr);
     if (window == nullptr) {
         spdlog::error("Failed to create GLFW window");
         return 1;
     }
-    glfwMakeContextCurrent(window);
-    glfwSwapInterval(1); // Enable vsync
-
-    // Initialize OpenGL loader
-    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
-        spdlog::error("Failed to initialize OpenGL context");
-        return 1;
-    }
-    s3Dive::debug::printGLInfo();
+    s3Dive::GLContext context(window);
+    context.init();
+    glEnable(GL_DEPTH_TEST);
 
     int screen_width;
     int screen_height;
     glfwGetFramebufferSize(window, &screen_width, &screen_height);
-    glViewport(0, 0, screen_width, screen_height);
+    renderer.setviewport(0, 0, screen_width, screen_height);
 
     // create our geometries
-    std::vector<float> triangle_vertices = {
-            // positions        // colors         // texture coords
-            0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right
-            0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
-            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
-            -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f  // top left
+//    std::vector<float> triangle_vertices = {
+//            // positions        // colors         // texture coords
+//            0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right
+//            0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
+//            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
+//            -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f  // top left
+//    };
+    std::vector<glm::vec3> cubePositions = {
+            glm::vec3(0.0f, 0.0f, 0.0f),
+            glm::vec3(2.0f, 5.0f, -15.0f),
+            glm::vec3(-1.5f, -2.2f, -2.5f),
+            glm::vec3(-3.8f, -2.0f, -12.3f),
+            glm::vec3(2.4f, -0.4f, -3.5f),
+            glm::vec3(-1.7f, 3.0f, -7.5f),
+            glm::vec3(1.3f, -2.0f, -2.5f),
+            glm::vec3(1.5f, 2.0f, -2.5f),
+            glm::vec3(1.5f, 0.2f, -1.5f),
+            glm::vec3(-1.3f, 1.0f, -1.5f)
     };
 
-    std::vector<unsigned int> indices = { // note that we start from 0!
-            0, 1, 3, // first triangle
-            1, 2, 3  // second triangle
+
+    std::vector<float> triangle_vertices = {
+            -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+            0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
+            0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+            0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+            -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+            -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+            0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+            0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
+            0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
+            -0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
+            -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+            -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+            -0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+            -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+            -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+            0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+            0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+            0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+            0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+            0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+            0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+            -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+            0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
+            0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+            0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+            -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+            -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+            -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
+            0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+            0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+            0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+            -0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
+            -0.5f, 0.5f, -0.5f, 0.0f, 1.0f
     };
+
+
+    auto sphere_vertices = generateNormalizedSphereVertices(36, 18);
+    auto indices = generateSphereIndices(36, 18);
     s3Dive::GLVertexArray vao;
-    s3Dive::GLVertexBuffer vbo(triangle_vertices);
-    s3Dive::GLIndexBuffer ibo(indices);
+    auto vbo = std::make_shared<s3Dive::GLVertexBuffer>(sphere_vertices);
+    auto ibo = std::make_shared<s3Dive::GLIndexBuffer>(indices);
     s3Dive::GLVertexBufferLayout layout;
     layout.addVertexElement<float>(3);
-    layout.addVertexElement<float>(3);
+//    layout.addVertexElement<float>(3);
     layout.addVertexElement<float>(2);
+    vbo->setLayout(layout);
 
-    vao.addBufferArray(vbo, layout);
+    vao.addVertexBuffer(vbo);
     vao.setIndexBuffer(ibo);
     // texture .jpg is in the root you need to back for cmake-build-debug
 
@@ -104,8 +190,8 @@ int main(int, char **) {
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
-        glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        renderer.clear();
+        renderer.setClearColor(glm::vec4(glm::vec3(0.24f), 1.0f));
 
         // feed inputs to dear imgui, start new frame
         ImGui_ImplOpenGL3_NewFrame();
@@ -116,24 +202,38 @@ int main(int, char **) {
         triangle_shader.use();
         tex.bind();
         vao.bind();
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+        renderer.drawIndexed(vao, indices.size());
         vao.unbind();
 
-        // render your GUI
         ImGui::Begin("Triangle Position/Color");
+        //check box to show wireframe
+        static bool wireframe = false;
+        ImGui::Checkbox("Wireframe", &wireframe);
+        glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
         static float rotation = 0.0;
         ImGui::SliderFloat("rotation", &rotation, 0, 2 * (float) M_PI);
         static float translation[] = {0.0, 0.0};
         ImGui::SliderFloat2("position", translation, -1.0, 1.0);
         static float color[4] = {1.0f, 1.0f, 1.0f, 1.0f};
         // pass the parameters to the shader
-        triangle_shader.updateShaderUniform("rotation", rotation);
-        triangle_shader.updateShaderUniform("translation", translation[0], translation[1]);
-        // color picker
-        ImGui::ColorEdit3("color", color);
-        // multiply triangle's color with this color
-        triangle_shader.updateShaderUniform("color", color[0], color[1], color[2]);
+        auto model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(translation[0], translation[1], 0.0f));
+        model = glm::rotate(model, rotation, glm::vec3(0.0f, 1.0f, 1.0f));
+        triangle_shader.updateShaderUniform("model", glm::value_ptr(model));
+
         ImGui::End();
+
+
+        glm::mat4 view = glm::mat4(1.0f);
+        // note that we’re translating the scene in the reverse direction
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        glm::mat4 projection;
+        projection = glm::perspective(glm::radians(45.0f), (float) screen_width / (float) screen_height,
+                                      0.1f, 100.0f);
+
+        triangle_shader.updateShaderUniform("view", glm::value_ptr(view));
+        triangle_shader.updateShaderUniform("projection", glm::value_ptr(projection));
+        // render your GUI
 
         // Render dear imgui into screen
         ImGui::Render();
@@ -142,8 +242,8 @@ int main(int, char **) {
         int display_w;
         int display_h;
         glfwGetFramebufferSize(window, &display_w, &display_h);
-        glViewport(0, 0, display_w, display_h);
-        glfwSwapBuffers(window);
+        renderer.setviewport(0, 0, display_w, display_h);
+        context.swapBuffers();
     }
 
     // Cleanup
