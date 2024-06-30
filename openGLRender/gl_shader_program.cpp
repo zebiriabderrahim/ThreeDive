@@ -3,21 +3,21 @@
 //
 #include <glad/glad.h>
 #include <spdlog/spdlog.h>
-#include "shader_program.h"
+#include "gl_shader_program.h"
 
 namespace s3Dive {
 
-    ShaderProgram::ShaderProgram() {
+    GLShaderProgram::GLShaderProgram() {
         programId_ = glCreateProgram();
     }
 
-    ShaderProgram::~ShaderProgram() {
+    GLShaderProgram::~GLShaderProgram() {
         glDeleteProgram(programId_);
     }
 
-    void ShaderProgram::initFromFiles(std::string_view vsPath, std::string_view fsPath) const {
-       auto vertexShader = Shader(GL_VERTEX_SHADER, vsPath.data());
-       auto fragmentShader = Shader(GL_FRAGMENT_SHADER, fsPath.data());
+    void GLShaderProgram::initFromFiles(std::string_view vsPath, std::string_view fsPath) const {
+        auto vertexShader = Shader(GL_VERTEX_SHADER, vsPath.data());
+        auto fragmentShader = Shader(GL_FRAGMENT_SHADER, fsPath.data());
 
         attachShader(vertexShader);
         attachShader(fragmentShader);
@@ -26,7 +26,8 @@ namespace s3Dive {
 
     }
 
-    void ShaderProgram::initFromFiles(std::string_view vsPath, std::string_view gsPath, std::string_view fsPath) const {
+    void
+    GLShaderProgram::initFromFiles(std::string_view vsPath, std::string_view gsPath, std::string_view fsPath) const {
 
         auto vertexShader = Shader(GL_VERTEX_SHADER, Shader::loadShaderFile(vsPath.data()));
         auto geometryShader = Shader(GL_GEOMETRY_SHADER, Shader::loadShaderFile(gsPath.data()));
@@ -39,24 +40,24 @@ namespace s3Dive {
         link();
     }
 
-    void ShaderProgram::use() const {
+    void GLShaderProgram::use() const {
         glUseProgram(programId_);
     }
 
-    void ShaderProgram::unuse() {
+    void GLShaderProgram::unuse() const {
         glUseProgram(0);
     }
 
-    void ShaderProgram::link() const {
+    void GLShaderProgram::link() const {
         glLinkProgram(programId_);
         checkLinkingErr();
     }
 
-    void ShaderProgram::attachShader(const Shader& shader) const{
+    void GLShaderProgram::attachShader(const Shader &shader) const {
         glAttachShader(programId_, shader.getShaderId());
     }
 
-    GLint ShaderProgram::getAttribLocation(std::string_view name, bool verbose)  {
+    GLint GLShaderProgram::getAttribLocation(std::string_view name, bool verbose) {
         if (auto it = attribLocationCache_.find(name.data()); it != attribLocationCache_.end()) {
             return it->second;
         }
@@ -68,7 +69,7 @@ namespace s3Dive {
         return location;
     }
 
-    GLint ShaderProgram::getUniformLocation(std::string_view name)  {
+    GLint GLShaderProgram::getUniformLocation(std::string_view name) {
         if (auto it = uniformLocationCache_.find(name.data()); it != uniformLocationCache_.end()) {
             return it->second;
         }
@@ -81,36 +82,42 @@ namespace s3Dive {
     }
 
     template<>
-    void ShaderProgram::setUniform<int>(const std::string& name, int val) {
-        glUniform1i(glGetUniformLocation(programId_, name.c_str()), val);
+    void GLShaderProgram::updateShaderUniform<int>(std::string_view name, int val) {
+        GLint location = getUniformLocation(name);
+        glUniform1i(location, val);
     }
 
     template<>
-    void ShaderProgram::setUniform<bool>(const std::string& name, bool val) {
-        glUniform1i(glGetUniformLocation(programId_, name.c_str()), val);
+    void GLShaderProgram::updateShaderUniform<bool>(std::string_view name, bool val) {
+        GLint location = getUniformLocation(name);
+        glUniform1i(location, val);
     }
 
     template<>
-    void ShaderProgram::setUniform<float>(const std::string& name, float val) {
-        glUniform1f(glGetUniformLocation(programId_, name.c_str()), val);
+    void GLShaderProgram::updateShaderUniform<float>(std::string_view name, float val) {
+        GLint location = getUniformLocation(name);
+        glUniform1f(location, val);
     }
 
     template<>
-    void ShaderProgram::setUniform<float>(const std::string& name, float val1, float val2) {
-        glUniform2f(glGetUniformLocation(programId_, name.c_str()), val1, val2);
+    void GLShaderProgram::updateShaderUniform<float>(std::string_view name, float val1, float val2) {
+        GLint location = getUniformLocation(name);
+        glUniform2f(location, val1, val2);
     }
 
     template<>
-    void ShaderProgram::setUniform<float>(const std::string& name, float val1, float val2, float val3) {
-        glUniform3f(glGetUniformLocation(programId_, name.c_str()), val1, val2, val3);
+    void GLShaderProgram::updateShaderUniform<float>(std::string_view name, float val1, float val2, float val3) {
+        GLint location = getUniformLocation(name);
+        glUniform3f(location, val1, val2, val3);
     }
 
     template<>
-    void ShaderProgram::setUniform<float*>(const std::string& name, float* val) {
-        glUniformMatrix4fv(glGetUniformLocation(programId_, name.c_str()), 1, GL_FALSE, val);
+    void GLShaderProgram::updateShaderUniform<float *>(std::string_view name, float *val) {
+        GLint location = getUniformLocation(name);
+        glUniformMatrix4fv(location, 1, GL_FALSE, val);
     }
 
-    void ShaderProgram::checkLinkingErr() const {
+    void GLShaderProgram::checkLinkingErr() const {
         GLint result;
         glGetProgramiv(programId_, GL_LINK_STATUS, &result);
 

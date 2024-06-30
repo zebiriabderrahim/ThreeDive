@@ -6,6 +6,8 @@
 #define THREEDIVE_GL_VERTEX_BUFFER_H
 
 #include <vector>
+#include "gl_vertex_buffer_layout.h"
+
 
 namespace s3Dive {
 
@@ -20,9 +22,13 @@ namespace s3Dive {
 
         void unbind() const;
 
+        void setLayout(const GLVertexBufferLayout &layout);
+
+        GLVertexBufferLayout &getLayout();
+
     private:
         unsigned int rendererID_{};
-
+        GLVertexBufferLayout layout_;
     };
 
 } // s3Dive

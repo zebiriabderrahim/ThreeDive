@@ -5,6 +5,7 @@
 to install the package, run the following command:
 ```bash
  conan profile detect --force
- conan install . --profile=default --build=missing
+ conan install . -s build_type=Debug --build=missing
+ conan build .
 ```
 ## License
