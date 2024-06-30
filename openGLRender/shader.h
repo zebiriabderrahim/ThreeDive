@@ -5,8 +5,6 @@
 #ifndef THREEDIVE_SHADER_H
 #define THREEDIVE_SHADER_H
 
-#include <glad/glad.h>
-
 namespace s3Dive {
 
     class Shader {

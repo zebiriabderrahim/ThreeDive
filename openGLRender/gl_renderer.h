@@ -22,7 +22,7 @@ namespace s3Dive {
 
         void setviewport(int x, int y, int width, int height) const;
 
-        void setClearColor(float r, float g, float b, float a) const;
+        void setClearColor(const glm::vec4 &color) const;
 
         void setlineWidth(float width) const;
 

@@ -2,9 +2,11 @@
 // Created by ABDERRAHIM ZEBIRI on 2024-06-29.
 //
 
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
-#include "spdlog/spdlog.h"
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <spdlog/spdlog.h>
+
 
 #include "gl_renderer.h"
 
@@ -42,8 +44,8 @@ namespace s3Dive {
         glViewport(x, y, width, height);
     }
 
-    void GLRenderer::setClearColor(float r, float g, float b, float a) const {
-        glClearColor(r, g, b, a);
+    void GLRenderer::setClearColor(const glm::vec4 &color) const {
+        glClearColor(color.r, color.g, color.b, color.a);
     }
 
     void GLRenderer::setlineWidth(float width) const {
