@@ -211,7 +211,7 @@ int main(int, char **) {
         ImGui::Checkbox("Wireframe", &wireframe);
         glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
         static float rotation = 0.0;
-        ImGui::SliderFloat("rotation", &rotation, 0, 2 * (float) M_PI);
+        ImGui::SliderFloat("rotation", &rotation, 0, 2 * glm::pi<float>());
         static float translation[] = {0.0, 0.0};
         ImGui::SliderFloat2("position", translation, -1.0, 1.0);
         static float color[4] = {1.0f, 1.0f, 1.0f, 1.0f};

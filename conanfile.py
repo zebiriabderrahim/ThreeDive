@@ -9,7 +9,6 @@ class ThreeDive(ConanFile):
     version = "1.0"
     settings = "os", "compiler", "build_type", "arch"
     generators = "CMakeDeps", "CMakeToolchain"
-    tool_requires = "cmake/3.22.6"
 
     def requirements(self):
         requirements = self.conan_data.get('requirements', [])
