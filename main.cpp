@@ -16,6 +16,7 @@
 #include "openGLRender/gl_texture.h"
 #include "openGLRender/gl_context.h"
 #include "openGLRender/gl_renderer.h"
+#include "renderer/ortho_camera.h"
 #include <vector>
 #include <cmath>
 
@@ -175,9 +176,11 @@ int main(int, char **) {
 
 
 
+
     // init shader
     s3Dive::GLShaderProgram triangle_shader;
     triangle_shader.initFromFiles("simple-shader.vs.glsl", "simple-shader.fs.glsl");
+    s3Dive::OrthoCamera camera(-3.0f, 3.0f, -3.0f, 3.0f);
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -214,25 +217,27 @@ int main(int, char **) {
         ImGui::SliderFloat("rotation", &rotation, 0, 2 * (float) M_PI);
         static float translation[] = {0.0, 0.0};
         ImGui::SliderFloat2("position", translation, -1.0, 1.0);
-        static float color[4] = {1.0f, 1.0f, 1.0f, 1.0f};
         // pass the parameters to the shader
+        camera.setPosition(glm::vec3(translation[0], translation[1], 0.0f));
+        camera.setRotation(rotation);
         auto model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(translation[0], translation[1], 0.0f));
-        model = glm::rotate(model, rotation, glm::vec3(0.0f, 1.0f, 1.0f));
+        auto view = camera.getView();
+        auto projection = camera.getProjection();
         triangle_shader.updateShaderUniform("model", glm::value_ptr(model));
-
+        triangle_shader.updateShaderUniform("view", glm::value_ptr(view));
+        triangle_shader.updateShaderUniform("projection", glm::value_ptr(projection));
         ImGui::End();
 
 
-        glm::mat4 view = glm::mat4(1.0f);
-        // note that we’re translating the scene in the reverse direction
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-        glm::mat4 projection;
-        projection = glm::perspective(glm::radians(45.0f), (float) screen_width / (float) screen_height,
-                                      0.1f, 100.0f);
-
-        triangle_shader.updateShaderUniform("view", glm::value_ptr(view));
-        triangle_shader.updateShaderUniform("projection", glm::value_ptr(projection));
+//        glm::mat4 view = glm::mat4(1.0f);
+//        // note that we’re translating the scene in the reverse direction
+//        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+//        glm::mat4 projection;
+//        projection = glm::perspective(glm::radians(45.0f), (float) screen_width / (float) screen_height,
+//                                      0.1f, 100.0f);
+//
+//        triangle_shader.updateShaderUniform("view", glm::value_ptr(view));
+//        triangle_shader.updateShaderUniform("projection", glm::value_ptr(projection));
         // render your GUI
 
         // Render dear imgui into screen

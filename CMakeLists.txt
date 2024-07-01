@@ -38,7 +38,9 @@ add_executable(ThreeDive
         openGLRender/gl_context.cpp
         openGLRender/gl_context.h
         openGLRender/gl_renderer.cpp
-        openGLRender/gl_renderer.h)
+        openGLRender/gl_renderer.h
+        renderer/ortho_camera.cpp
+        renderer/ortho_camera.h)
 
 add_custom_command(TARGET ThreeDive
         POST_BUILD
