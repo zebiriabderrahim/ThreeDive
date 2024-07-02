@@ -8,24 +8,26 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
+#include "ICamera.h"
+
 
 namespace s3Dive {
 
-    class OrthoCamera {
+    class OrthoCamera: public ICamera{
 
     public:
         OrthoCamera(float left, float right, float bottom, float top);
 
-        void setPosition(const glm::vec3 &position);
-        void setRotation(float rotation);
+        void setPosition(const glm::vec3 &position) override { position_ = position; updateView(); }
+        void setRotation(float rotation) override { m_Rotation = rotation; updateView(); }
 
-        [[nodiscard]] const glm::mat4 &getView() const;
-        [[nodiscard]] const glm::mat4 &getProjection() const;
-        [[nodiscard]] const glm::vec3 &getPosition() const;
-        [[nodiscard]] float getRotation() const;
+        [[nodiscard]] const glm::vec3 &getPosition() const override { return position_; }
+        [[nodiscard]] float getRotation() const override { return m_Rotation; }
+        [[nodiscard]] const glm::mat4 &getViewMatrix() const override { return view_; }
+        [[nodiscard]] const glm::mat4 &getProjectionMatrix() const override { return projection_; }
 
     private:
-        void updateView();
+        void updateView() override;
         glm::mat4 view_{};
         glm::mat4 projection_{};
         glm::vec3 position_{};

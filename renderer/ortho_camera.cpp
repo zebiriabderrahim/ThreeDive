@@ -12,32 +12,6 @@ namespace s3Dive {
               position_(0.0f){
     }
 
-    void OrthoCamera::setPosition(const glm::vec3 &position) {
-        position_ = position;
-        updateView();
-    }
-
-    void OrthoCamera::setRotation(float rotation) {
-        m_Rotation = rotation;
-        updateView();
-    }
-
-    const glm::mat4 &OrthoCamera::getView() const {
-        return view_;
-    }
-
-    const glm::mat4 &OrthoCamera::getProjection() const {
-        return projection_;
-    }
-
-    const glm::vec3 &OrthoCamera::getPosition() const {
-        return position_;
-    }
-
-    float OrthoCamera::getRotation() const {
-        return m_Rotation;
-    }
-
     void OrthoCamera::updateView() {
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), position_);
         transform *=glm::rotate(glm::mat4(1.0f),
