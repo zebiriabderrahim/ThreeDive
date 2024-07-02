@@ -4,9 +4,7 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
-
 
 #include "gl_renderer.h"
 
@@ -40,7 +38,7 @@ namespace s3Dive {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    void GLRenderer::setviewport(int x, int y, int width, int height) const {
+    void GLRenderer::setViewport(int x, int y, int width, int height) const {
         glViewport(x, y, width, height);
     }
 
@@ -48,7 +46,7 @@ namespace s3Dive {
         glClearColor(color.r, color.g, color.b, color.a);
     }
 
-    void GLRenderer::setlineWidth(float width) const {
+    void GLRenderer::setLineWidth(float width) const {
         glLineWidth(width);
     }
 
@@ -58,8 +56,8 @@ namespace s3Dive {
         glDrawElements(GL_TRIANGLES, static_cast<GLint>(count), GL_UNSIGNED_INT, nullptr);
     }
 
-    void GLRenderer::drawlines(const GLVertexArray &vao, GLuint indexCount) const {
+    void GLRenderer::drawLines(const GLVertexArray &vao, GLint indexCount) const {
         vao.bind();
-        glDrawArrays(GL_LINES, 0, static_cast<GLint>(indexCount));
+        glDrawArrays(GL_TRIANGLE_FAN, 0, indexCount);
     }
 } // s3Dive
