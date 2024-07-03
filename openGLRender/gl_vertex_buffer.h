@@ -16,6 +16,8 @@ namespace s3Dive {
 
     public:
         explicit GLVertexBuffer(const std::vector<float> &data);
+        explicit GLVertexBuffer(const std::vector<glm::vec3> &data);
+
         ~GLVertexBuffer();
 
         void bind() const;
