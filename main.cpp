@@ -13,94 +13,79 @@
 #include "openGLRender/gl_vertex_buffer.h"
 #include "openGLRender/gl_index_buffer.h"
 #include "openGLRender/gl_vertex_buffer_layout.h"
-#include "openGLRender/gl_texture.h"
 #include "openGLRender/gl_context.h"
 #include "openGLRender/gl_renderer.h"
-#include "renderer/ortho_camera.h"
 #include "renderer/Camera.h"
 #include <vector>
 #include <cmath>
-bool firstMouse = true;
-float deltaTime = 0.0f;	// time between current frame and last frame
+
+
+float deltaTime = 0.0f;    // time between current frame and last frame
 float lastFrame = 0.0f;
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
+
+
 s3Dive::VectorialCameraConfig config(glm::vec3(0.0f, 0.0f, 3.0f));
 s3Dive::Camera camera(config);
+
 std::vector<float> generateDetailedGridVertices(float size, float step, float extensionSize = 0.5f, int fadeSteps = 5) {
     std::vector<float> vertices;
+    int lineCount = static_cast<int>((2 * size) / step) + 1;
 
-    int mainLineCount = static_cast<int>((2 * size) / step) + 1;
-    float stepAlpha = 1.0f / (fadeSteps + 1);
-
-    auto addLine = [&](float x1, float y1, float x2, float y2, bool isMainLine) {
+    auto addLine = [&](const glm::vec3 &start, const glm::vec3 &end, bool isMainLine) {
         float alpha = isMainLine ? 1.0f : 0.5f;
-        float visibility = isMainLine ? 1.0f : 0.0f; // 1.0 for main lines, 0.0 for detail lines
-        float lineExtensionSize = isMainLine ? extensionSize : extensionSize * 0.5f;
+        float visibility = isMainLine ? 1.0f : 0.0f;
+        glm::vec3 direction = glm::normalize(end - start);
+        glm::vec3 extension = direction * (isMainLine ? extensionSize : extensionSize * 0.5f);
 
-        // Main part of the line
-        vertices.insert(vertices.end(), {
-                x1, y1, 0.0f, 1.0f, 1.0f, 1.0f, alpha, visibility
-        });
-        vertices.insert(vertices.end(), {
-                x2, y2, 0.0f, 1.0f, 1.0f, 1.0f, alpha, visibility
-        });
+        auto addVertex = [&](const glm::vec3 &pos, float a) {
+            vertices.insert(vertices.end(), {pos.x, pos.y, pos.z, 1.0f, 1.0f, 1.0f, a, visibility});
+        };
 
-        // Fading extensions
-        for (int j = 1; j <= fadeSteps; ++j) {
-            float fadeAlpha = alpha * (1.0f - j * stepAlpha);
-            float extLength = j * (lineExtensionSize / fadeSteps);
+        // Main line
+        addVertex(start, alpha);
+        addVertex(end, alpha);
 
-            if (x1 == x2) { // Vertical line
-                vertices.insert(vertices.end(), {
-                        x1, y1 - extLength, 0.0f, 1.0f, 1.0f, 1.0f, fadeAlpha, visibility,
-                        x1, y1 - extLength + (lineExtensionSize / fadeSteps), 0.0f, 1.0f, 1.0f, 1.0f, fadeAlpha - stepAlpha, visibility,
-                        x2, y2 + extLength - (lineExtensionSize / fadeSteps), 0.0f, 1.0f, 1.0f, 1.0f, fadeAlpha, visibility,
-                        x2, y2 + extLength, 0.0f, 1.0f, 1.0f, 1.0f, fadeAlpha - stepAlpha, visibility
-                });
-            } else { // Horizontal line
-                vertices.insert(vertices.end(), {
-                        x1 - extLength, y1, 0.0f, 1.0f, 1.0f, 1.0f, fadeAlpha, visibility,
-                        x1 - extLength + (lineExtensionSize / fadeSteps), y1, 0.0f, 1.0f, 1.0f, 1.0f, fadeAlpha - stepAlpha, visibility,
-                        x2 + extLength - (lineExtensionSize / fadeSteps), y2, 0.0f, 1.0f, 1.0f, 1.0f, fadeAlpha, visibility,
-                        x2 + extLength, y2, 0.0f, 1.0f, 1.0f, 1.0f, fadeAlpha - stepAlpha, visibility
-                });
-            }
+        // Extensions
+        for (int i = 0; i < fadeSteps; ++i) {
+            float t1 = static_cast<float>(i) / fadeSteps;
+            float t2 = static_cast<float>(i + 1) / fadeSteps;
+            float alpha1 = alpha * (1.0f - t1);
+            float alpha2 = alpha * (1.0f - t2);
+
+            // Start extension
+            addVertex(start - extension * t1, alpha1);
+            addVertex(start - extension * t2, alpha2);
+
+            // End extension
+            addVertex(end + extension * t1, alpha1);
+            addVertex(end + extension * t2, alpha2);
         }
     };
 
-    // Main grid lines
-    for (int i = 0; i < mainLineCount; ++i) {
+    // Generate lines
+    for (int i = 0; i < lineCount; ++i) {
         float pos = -size + i * step;
+        // Vertical lines
+        addLine({pos, -size, 0}, {pos, size, 0}, true);
+        // Horizontal lines
+        addLine({-size, pos, 0}, {size, pos, 0}, true);
 
-        // Vertical main line
-        addLine(pos, -size, pos, size, true);
-
-        // Horizontal main line
-        addLine(-size, pos, size, pos, true);
-    }
-
-    // Detail grid lines
-    for (int i = 0; i < mainLineCount - 1; ++i) {
-        float pos = -size + (i + 0.5f) * step;
-
-        // Vertical detail line
-        addLine(pos, -size, pos, size, false);
-
-        // Horizontal detail line
-        addLine(-size, pos, size, pos, false);
+        // Detail lines
+        if (i < lineCount - 1) {
+            float detailPos = pos + step * 0.5f;
+            addLine({detailPos, -size, 0}, {detailPos, size, 0}, false);
+            addLine({-size, detailPos, 0}, {size, detailPos, 0}, false);
+        }
     }
 
     return vertices;
 }
 
-
-
-
-
-    std::vector<float> generateNormalizedSphereVertices(int sectorCount, int stackCount) {
+std::vector<float> generateNormalizedSphereVertices(int sectorCount, int stackCount) {
     std::vector<float> vertices;
     float radius = 1.0f; // Unit sphere
 
@@ -129,9 +114,9 @@ std::vector<float> generateDetailedGridVertices(float size, float step, float ex
 
     return vertices;
 }
-void processInput(GLFWwindow *window, s3Dive::Camera &camera, float deltaTime)
-{
-if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+
+void processInput(GLFWwindow *window, s3Dive::Camera &camera, float deltaTime) {
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         camera.processKeyboard(s3Dive::CameraMovement::FORWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
         camera.processKeyboard(s3Dive::CameraMovement::BACKWARD, deltaTime);
@@ -141,15 +126,13 @@ if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         camera.processKeyboard(s3Dive::CameraMovement::RIGHT, deltaTime);
 }
 
-void mouse_callback(GLFWwindow* window, double xpos, double ypos)
-{
+void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
     static float lastX = 800.0f / 2.0;
     static float lastY = 600.0 / 2.0;
 
     static bool firstMouse = true;
 
-    if (firstMouse)
-    {
+    if (firstMouse) {
         lastX = xpos;
         lastY = ypos;
         firstMouse = false;
@@ -165,8 +148,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     camera.processMouseMovement(xoffset, yoffset);
 }
 
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
+void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
     camera.processMouseScroll(static_cast<float >(yoffset));
 }
 
@@ -208,7 +190,6 @@ int main(int, char **) {
     }
 
 
-
     s3Dive::GLContext context(window);
     context.init();
     glEnable(GL_DEPTH_TEST);
@@ -220,107 +201,30 @@ int main(int, char **) {
     glfwGetFramebufferSize(window, &screen_width, &screen_height);
     renderer.setViewport(0, 0, screen_width, screen_height);
 
-    // create our geometries
-//    std::vector<float> triangle_vertices = {
-//            // positions        // colors         // texture coords
-//            0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right
-//            0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
-//            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
-//            -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f  // top left
-//    };
-    std::vector<glm::vec3> cubePositions = {
-            glm::vec3(0.0f, 0.0f, 0.0f),
-            glm::vec3(2.0f, 5.0f, -15.0f),
-            glm::vec3(-1.5f, -2.2f, -2.5f),
-            glm::vec3(-3.8f, -2.0f, -12.3f),
-            glm::vec3(2.4f, -0.4f, -3.5f),
-            glm::vec3(-1.7f, 3.0f, -7.5f),
-            glm::vec3(1.3f, -2.0f, -2.5f),
-            glm::vec3(1.5f, 2.0f, -2.5f),
-            glm::vec3(1.5f, 0.2f, -1.5f),
-            glm::vec3(-1.3f, 1.0f, -1.5f)
-    };
-
-
-    std::vector<float> triangle_vertices = {
-            -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
-            0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
-            0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-            0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-            -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
-            -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-            0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-            0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
-            0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
-            -0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
-            -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-            -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-            -0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-            -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-            -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-            0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-            0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-            0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-            0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-            0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-            0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-            -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-            0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
-            0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-            0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-            -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-            -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-            -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-            0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-            0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-            0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-            -0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
-            -0.5f, 0.5f, -0.5f, 0.0f, 1.0f
-    };
-
-
+    float gridSize = 10.0f;
+    float gridStep = 2.0f;
+    float extensionSize = 4.0f;
+    int fadeSteps = 5;
+    float detailLineLength = 0.5f;
     auto sphere_vertices = generateNormalizedSphereVertices(36, 18);
     auto indices = generateSphereIndices(36, 18);
-    float gridSize = 5.0f;
-    float gridStep = 1.0f;
-    float extensionSize = 0.5f;
-    int fadeSteps = 5;
-
-    // Calculate total number of vertices
-    int mainLineCount = static_cast<int>((2 * gridSize) / gridStep) + 1;
-    int verticesPerLine = 2 + 4 * fadeSteps; // 2 for main line, 4 for each fade step
-    int totalVertices = mainLineCount * 2 * verticesPerLine; // Vertical and horizontal lines
-    totalVertices += (mainLineCount - 1) * 2 * verticesPerLine; // Detail lines
+    auto grid_vertices = generateDetailedGridVertices(gridSize, gridStep, extensionSize, fadeSteps);
 
     s3Dive::GLVertexArray vao;
-    //auto vbo = std::make_shared<s3Dive::GLVertexBuffer>(grid_vertices);
+    auto vbo = std::make_shared<s3Dive::GLVertexBuffer>(grid_vertices);
 //    auto ibo = std::make_shared<s3Dive::GLIndexBuffer>(indices);
     s3Dive::GLVertexBufferLayout layout;
     layout.addVertexElement<float>(3);
     layout.addVertexElement<float>(4);
     layout.addVertexElement<float>(1);
-    //vbo->setLayout(layout);
+    vbo->setLayout(layout);
 
-    //vao.addVertexBuffer(vbo);
+    vao.addVertexBuffer(vbo);
     //vao.setIndexBuffer(ibo);
     //s3Dive::GLTexture tex("wall.jpg");
     s3Dive::GLShaderProgram triangle_shader;
     triangle_shader.initFromFiles("grid.vert", "grid.frag");
-   // Setup Dear ImGui
-
-
-
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    [[maybe_unused]] ImGuiIO const &io = ImGui::GetIO();
-    // Setup Platform/Renderer bindings
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init(glsl_version);
-    // Setup Dear ImGui style
-    ImGui::StyleColorsDark();
+    // Setup Dear ImGui
 
     // disable the window resizing
     while (!glfwWindowShouldClose(window)) {
@@ -336,39 +240,22 @@ int main(int, char **) {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_LINE_SMOOTH);
         glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-        renderer.setLineWidth(0.5f);
-        glDrawArrays(GL_LINES, 0, totalVertices);
+        renderer.drawLines(vao, grid_vertices.size() / 8);
         vao.bind();
         // feed inputs to dear imgui, start new frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
         glm::mat4 model = glm::mat4(1.0f);
         triangle_shader.updateShaderUniform("model", glm::value_ptr(model));
-        glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float) SCR_WIDTH / (float) SCR_HEIGHT,
+                                                0.1f, 100.0f);
         triangle_shader.updateShaderUniform("projection", glm::value_ptr(projection));
         glm::mat4 view = camera.getViewMatrix();
         triangle_shader.updateShaderUniform("view", glm::value_ptr(view));
-        float cameraDistance = glm::length(camera.getPosition() - glm::vec3(0.0f, 0.0f, 0.0f));
-        float detailVisibility = glm::clamp(1.0f - (cameraDistance / 20.0f), 0.0f, 1.0f);
+        float cameraDistance = glm::length(camera.getZoom() - glm::vec3(0.0f, 0.0f, 0.0f));
+        float detailVisibility = glm::clamp(1.0f - (cameraDistance / 40.0f), 0.0f, 1.0f);
 
         triangle_shader.updateShaderUniform("detailVisibility", detailVisibility);
-
-        ImGui::Begin("Triangle Position/Color");
-        static bool wireframe = false;
-        ImGui::Checkbox("Wireframe", &wireframe);
-        glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
-        ImGui::End();
-        // Render dear imgui into screen
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         context.swapBuffers();
     }
-
-    // Cleanup
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
 
     glfwDestroyWindow(window);
     glfwTerminate();

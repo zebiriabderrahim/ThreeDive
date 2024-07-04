@@ -58,6 +58,6 @@ namespace s3Dive {
 
     void GLRenderer::drawLines(const GLVertexArray &vao, GLint indexCount) const {
         vao.bind();
-        glDrawArrays(GL_TRIANGLE_FAN, 0, indexCount);
+        glDrawArrays(GL_LINES, 0, indexCount);
     }
 } // s3Dive

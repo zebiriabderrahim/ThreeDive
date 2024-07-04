@@ -40,12 +40,22 @@ add_executable(ThreeDive
         openGLRender/gl_renderer.cpp
         openGLRender/gl_renderer.h
         renderer/ortho_camera.cpp
-        renderer/ortho_camera.h)
+        renderer/ortho_camera.h
+        renderer/Camera.cpp
+        renderer/Camera.h
+        renderer/ICamera.h
+        renderer/perspective_camera.cpp
+        renderer/perspective_camera.h
+        core/memory_and_binding.h
+        scene/scene_node.cpp
+        scene/scene_node.h)
 
 add_custom_command(TARGET ThreeDive
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/assets/simple-shader.vs.glsl $<TARGET_FILE_DIR:ThreeDive>
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/assets/simple-shader.fs.glsl $<TARGET_FILE_DIR:ThreeDive>
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/assets/grid.vert $<TARGET_FILE_DIR:ThreeDive>
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/assets/grid.frag $<TARGET_FILE_DIR:ThreeDive>
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/assets/wall.jpg $<TARGET_FILE_DIR:ThreeDive>
         )
 
