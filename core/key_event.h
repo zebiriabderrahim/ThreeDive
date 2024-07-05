@@ -7,7 +7,7 @@
 
 #include <sstream>
 #include "event.h"
-#include "KeyCodes.h"
+#include "key_codes.h"
 
 namespace s3Dive {
 
