@@ -48,7 +48,7 @@ add_executable(ThreeDive
         renderer/perspective_camera.h
         core/memory_and_binding.h
         scene/scene_node.cpp
-        scene/scene_node.h)
+        scene/scene_node.h core/event.h core/mouse_event.h core/key_event.h core/key_codes.h)
 
 add_custom_command(TARGET ThreeDive
         POST_BUILD
