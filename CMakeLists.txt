@@ -41,14 +41,17 @@ add_executable(ThreeDive
         openGLRender/gl_renderer.h
         renderer/ortho_camera.cpp
         renderer/ortho_camera.h
-        renderer/Camera.cpp
-        renderer/Camera.h
         renderer/ICamera.h
         renderer/perspective_camera.cpp
         renderer/perspective_camera.h
-        core/memory_and_binding.h
+        renderer/CameraController.cpp
+        renderer/CameraController.h
         scene/scene_node.cpp
-        scene/scene_node.h core/event.h core/mouse_event.h core/key_event.h core/key_codes.h)
+        scene/scene_node.h core/event.h
+        core/memory_and_binding.h
+        core/key_codes.h
+        core/App.cpp
+        core/App.h)
 
 add_custom_command(TARGET ThreeDive
         POST_BUILD
