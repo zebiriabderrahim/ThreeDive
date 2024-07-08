@@ -51,7 +51,7 @@ add_executable(ThreeDive
         core/memory_and_binding.h
         core/key_codes.h
         core/App.cpp
-        core/App.h)
+        core/App.h core/InputManager.cpp core/InputManager.h core/geo_util.h)
 
 add_custom_command(TARGET ThreeDive
         POST_BUILD
