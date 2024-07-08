@@ -18,6 +18,9 @@ namespace s3Dive {
 
         void setPosition(const glm::vec3& position) override { position_ = position; updateView(); }
         void setRotation(float rotation) override { rotation_ = rotation; updateView(); }
+        void setViewMatrix(const glm::mat4 &viewMatrix) override { viewMatrix_ = viewMatrix;}
+        void setAspectRatio(float aspectRatio) override { aspectRatio_ = aspectRatio; updateView(); }
+        void setProjectionMatrix(const glm::mat4 &projectionMatrix) override { projectionMatrix_ = projectionMatrix; }
 
         [[nodiscard]] const glm::mat4& getViewMatrix() const override { return viewMatrix_; }
         [[nodiscard]] const glm::mat4& getProjectionMatrix() const override { return projectionMatrix_; }

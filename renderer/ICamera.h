@@ -16,6 +16,9 @@ namespace s3Dive {
 
         virtual void setPosition(const glm::vec3& position) = 0;
         virtual void setRotation(float rotation) = 0;
+        virtual void setAspectRatio(float aspectRatio) = 0;
+        virtual void setViewMatrix(const glm::mat4& viewMatrix) = 0;
+        virtual void setProjectionMatrix(const glm::mat4& projectionMatrix) = 0;
         virtual const glm::mat4& getViewMatrix() const = 0;
         virtual const glm::mat4& getProjectionMatrix() const = 0;
         virtual const glm::vec3& getPosition() const = 0;
