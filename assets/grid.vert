@@ -6,18 +6,16 @@ layout (location = 2) in float aVisibility;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
-uniform float detailVisibility;
+uniform float detailVisibility1;
+uniform float detailVisibility2;
 
 out vec4 vertexColor;
+out float visibility;
 
 void main() {
-    gl_Position = projection * view * model * vec4(aPos, 1.0);
+    vec4 viewPos = view * model * vec4(aPos, 1.0);
+    gl_Position = projection * viewPos;
 
-    // Apply detail visibility only to detail lines (aVisibility == 0.0)
-    float finalAlpha = aColor.a;
-    if (aVisibility < 0.5) {
-        finalAlpha *= detailVisibility;
-    }
-
-    vertexColor = vec4(aColor.rgb, finalAlpha);
+    visibility = aVisibility;
+    vertexColor = aColor;
 }
