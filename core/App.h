@@ -6,8 +6,6 @@
 #ifndef THREEDIVE_APP_H
 #define THREEDIVE_APP_H
 
-
-
 #include <memory>
 #include <vector>
 #include <glm/glm.hpp>
@@ -20,50 +18,47 @@
 #include "../openGLRender/gl_vertex_array.h"
 #include "../openGLRender/gl_vertex_buffer.h"
 #include "../openGLRender/gl_vertex_buffer_layout.h"
+#include "../openGLRender/gl_renderer.h"
 
 namespace s3Dive {
 
-        class TestApplication {
-        public:
-            TestApplication(GLFWwindow* window);
-            TestApplication(const TestApplication&) = delete;
-            TestApplication& operator=(const TestApplication&) = delete;
-            TestApplication(TestApplication&&) = default;
-            TestApplication& operator=(TestApplication&&) = default;
-            ~TestApplication();
+    class TestApplication {
+    public:
+        explicit TestApplication(GLFWwindow* window);
+        ~TestApplication();
 
-            [[nodiscard]] bool initialize();
-            void run();
-            void onUpdate(float deltaTime);
-            void onRender();
+        TestApplication(const TestApplication&) = delete;
+        TestApplication& operator=(const TestApplication&) = delete;
 
-        private:
-            GLFWwindow* window_;
-            std::unique_ptr<ICamera> camera_;
-            std::unique_ptr<CameraController> cameraController_;
-            GLShaderProgram triangleShader_;
-            GLVertexArray vao_;
-            std::shared_ptr<GLVertexBuffer> vbo_;
+        bool initialize();
+        void run();
 
-            EventQueue eventQueue_;
-            EventDispatcher eventDispatcher_;
-            const unsigned int SCR_WIDTH = 800;
-            const unsigned int SCR_HEIGHT = 600;
+    private:
+        static constexpr unsigned int kScreenWidth = 800;
+        static constexpr unsigned int kScreenHeight = 600;
 
-            std::vector<float> gridVertices_;
+        GLFWwindow* window_;
+        std::unique_ptr<InputManager> inputManager_;
+        std::unique_ptr<CameraController> cameraController_;
+        GLShaderProgram gridShader_;
+        GLRenderer renderer_;
+        GLVertexArray vao_;
+        std::shared_ptr<GLVertexBuffer> vbo_;
 
-            void initializeCamera();
-            void initializeEventSystem();
-            void initializeGrid();
-            void processInput(float deltaTime);
+        std::vector<float> gridVertices_;
 
-            std::vector<float> generateDetailedGridVertices(float size, float step, float extensionSize, int fadeSteps);
+        void onUpdate(float deltaTime);
+        void onRender();
+        void initializeCamera();
+        void initializeEventSystem();
+        void initializeGrid();
 
-            static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
-            static void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
-            static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
-            static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-        };
+        static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
+        static void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
+        static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+        static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+        static void windowResizeCallback(GLFWwindow* window, int width, int height);
+    };
 
 } // namespace s3Dive
 

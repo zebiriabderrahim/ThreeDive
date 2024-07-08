@@ -1,80 +1,64 @@
-//
-// Created by ABDERRAHIM ZEBIRI on 2024-07-06.
-//
-
-#ifndef THREEDIVE_CAMERACONTROLLER_H
-#define THREEDIVE_CAMERACONTROLLER_H
-
 #pragma once
 
-#include "ICamera.h"
-#include "../core/event.h"
 #include <memory>
 #include <glm/glm.hpp>
-#include <GLFW/glfw3.h>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include "../core/InputManager.h"
+#include "ICamera.h"
 
 namespace s3Dive {
 
-    enum class ViewMode {
-        Perspective,
-        Orthographic
-    };
-
-    enum class StandardView {
-        Top,
-        Front,
-        Side,
-        Isometric
+    struct CameraSettings {
+        float fieldOfView = 45.0f;
+        float nearPlane = 0.1f;
+        float farPlane = 1000.0f;
+        float minDistance = 1.0f;
+        float maxDistance = 100.0f;
+        float orbitSpeed = 0.005f;
+        float zoomSpeed = 0.1f;
+        glm::vec3 initialPosition = glm::vec3(40.0f, 40.0f, 40.0f);
+        glm::vec3 targetPosition = glm::vec3(0.0f, 0.0f, 0.0f);
+        glm::vec3 upVector = glm::vec3(0.0f, 0.0f, 1.0f);
     };
 
     class CameraController {
     public:
-        CameraController(std::unique_ptr<ICamera> camera, GLFWwindow* window);
-        ~CameraController() = default;
+        explicit CameraController(std::unique_ptr<ICamera> camera, const InputManager& inputManager, const CameraSettings& settings = CameraSettings{});
 
-        CameraController(const CameraController&) = delete;
-        CameraController& operator=(const CameraController&) = delete;
-        CameraController(CameraController&&) = default;
-        CameraController& operator=(CameraController&&) = default;
-
-        void handleEvent(const EventVariant& event);
         void update(float deltaTime);
-
-        void setViewMode(ViewMode mode);
-        void setStandardView(StandardView view);
+        void setViewportSize(int width, int height);
 
         [[nodiscard]] const ICamera& getCamera() const { return *camera_; }
         [[nodiscard]] ICamera& getCamera() { return *camera_; }
+        [[nodiscard]] float getDetailVisibility1() const { return detailVisibility1_; }
+        [[nodiscard]] float getDetailVisibility2() const { return detailVisibility2_; }
 
     private:
-        float orbitSpeed_ = 0.1f;
-        float panSpeed_ = 0.005f;
-        float zoomSpeed_ = 5.0f;
         std::unique_ptr<ICamera> camera_;
-        GLFWwindow* window_;
-        glm::vec3 focalPoint_{0.0f};
-        float orbitRadius_{10.0f};
-        ViewMode currentViewMode_{ViewMode::Perspective};
+        const InputManager& inputManager_;
+        CameraSettings settings_;
 
-        bool isPanning_ = false;
+        glm::vec3 position_{0.0f, 0.0f, 10.0f};
+        glm::quat rotation_{1.0f, 0.0f, 0.0f, 0.0f};
+        float distance_ = 10.0f;
+
+        glm::vec2 lastMousePos_{0.0f};
         bool isOrbiting_ = false;
-        glm::dvec2 lastMousePos_{0.0, 0.0};
 
-        void processEvent(const MouseMovedEvent& e);
-        void processEvent(const MouseScrolledEvent& e);
-        void processEvent(const KeyPressedEvent& e);
-        void processEvent(const MouseButtonPressedEvent& e);
-        void processEvent(const MouseButtonReleasedEvent& e);
+        float aspectRatio_ = 1.0f;
 
-        template<typename T>
-        void processEvent(const T&) { /* Do nothing for unhandled events */ }
+        float detailVisibility1_ = 1.0f;
+        float detailVisibility2_ = 1.0f;
+        static constexpr float kDetailVisibilityNear1 = 20.0f;
+        static constexpr float kDetailVisibilityFar1 = 40.0f;
+        static constexpr float kDetailVisibilityNear2 = 10.0f;
+        static constexpr float kDetailVisibilityFar2 = 20.0f;
 
-        void orbit(float deltaX, float deltaY);
-        void pan(float deltaX, float deltaY);
-        void zoom(float delta);
-        void updateCameraPosition();
+        void handleMouseOrbit(const glm::vec2& mouseDelta);
+        void handleMouseZoom(float zoomDelta);
+        void updateCameraMatrices();
+        void initializeView();
     };
 
 } // namespace s3Dive
-
-#endif //THREEDIVE_CAMERACONTROLLER_H
