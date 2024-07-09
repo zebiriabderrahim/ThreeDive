@@ -9,8 +9,8 @@
 #include <memory>
 #include <vector>
 #include <glm/glm.hpp>
+#include <GLFW/glfw3.h>
 
-#include "event.h"
 #include "../renderer/ICamera.h"
 #include "../renderer/perspective_camera.h"
 #include "../renderer/CameraController.h"
@@ -19,12 +19,13 @@
 #include "../openGLRender/gl_vertex_buffer.h"
 #include "../openGLRender/gl_vertex_buffer_layout.h"
 #include "../openGLRender/gl_renderer.h"
+#include "Window.h"
 
 namespace s3Dive {
 
     class TestApplication {
     public:
-        explicit TestApplication(GLFWwindow* window);
+         explicit TestApplication(const std::shared_ptr<Window>& window);
         ~TestApplication();
 
         TestApplication(const TestApplication&) = delete;
@@ -37,9 +38,8 @@ namespace s3Dive {
         static constexpr unsigned int kScreenWidth = 800;
         static constexpr unsigned int kScreenHeight = 600;
 
-        GLFWwindow* window_;
-        std::unique_ptr<InputManager> inputManager_;
-        std::unique_ptr<CameraController> cameraController_;
+        SharedPtr<Window> window_;
+        UniquePtr<CameraController> cameraController_;
         GLShaderProgram gridShader_;
         GLRenderer renderer_;
         GLVertexArray vao_;
@@ -47,11 +47,11 @@ namespace s3Dive {
 
         std::vector<float> gridVertices_;
 
-        void onUpdate(float deltaTime);
         void onRender();
         void initializeCamera();
         void initializeEventSystem();
         void initializeGrid();
+        void processEvents();
 
         static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
         static void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
