@@ -139,6 +139,8 @@ namespace s3Dive {
 
     struct MouseButtonPressedEvent {
         MouseCode button;
+        float x;
+        float y;
         [[nodiscard]] EventType getEventType() const { return EventType::MouseButtonPressed; }
         [[nodiscard]] EventCategory getCategoryFlags() const { return EventCategoryMouse | EventCategoryInput; }
         [[nodiscard]] std::string toString() const {
@@ -150,6 +152,8 @@ namespace s3Dive {
 
     struct MouseButtonReleasedEvent {
         MouseCode button;
+        float x;
+        float y;
        [[nodiscard]] EventType getEventType() const { return EventType::MouseButtonReleased; }
        [[nodiscard]] EventCategory getCategoryFlags() const { return EventCategoryMouse | EventCategoryInput; }
        [[nodiscard]] std::string toString() const {

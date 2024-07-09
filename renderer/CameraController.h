@@ -4,8 +4,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
-#include "../core/InputManager.h"
 #include "ICamera.h"
+#include "../core/Event.h"
 
 namespace s3Dive {
 
@@ -24,10 +24,12 @@ namespace s3Dive {
 
     class CameraController {
     public:
-        explicit CameraController(std::unique_ptr<ICamera> camera, const InputManager& inputManager, const CameraSettings& settings = CameraSettings{});
+        explicit CameraController(std::unique_ptr<ICamera> camera, const CameraSettings& settings = CameraSettings{});
 
-        void update(float deltaTime);
-        void setViewportSize(int width, int height);
+        void update();
+        void onEvent(const EventVariant& event);
+
+        void setViewportSize(unsigned int width, unsigned int height);
 
         [[nodiscard]] const ICamera& getCamera() const { return *camera_; }
         [[nodiscard]] ICamera& getCamera() { return *camera_; }
@@ -36,16 +38,13 @@ namespace s3Dive {
 
     private:
         std::unique_ptr<ICamera> camera_;
-        const InputManager& inputManager_;
         CameraSettings settings_;
 
-        glm::vec3 position_{0.0f, 0.0f, 10.0f};
-        glm::quat rotation_{1.0f, 0.0f, 0.0f, 0.0f};
-        float distance_ = 10.0f;
+        glm::vec3 position_{};
+        float distance_{};
 
-        glm::vec2 lastMousePos_{0.0f};
+        glm::vec2 lastMousePos_{};
         bool isOrbiting_ = false;
-
         float aspectRatio_ = 1.0f;
 
         float detailVisibility1_ = 1.0f;
