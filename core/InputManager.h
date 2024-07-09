@@ -9,6 +9,8 @@
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include "key_codes.h"
+
 
 namespace s3Dive {
     class InputManager {
@@ -32,15 +34,15 @@ namespace s3Dive {
         void resetScrollDelta() { scrollDelta_ = 0.0f; }
 
         // Added methods
-        [[nodiscard]] bool isKeyPressed(int key) const;
-        void setMousePosition(double xpos, double ypos);
+        [[nodiscard]] bool isKeyPressed(Key::KeyCode key) const;
+        void setMousePosition(double xPos, double yPos);
         void setMouseButton(int button, bool pressed);
         void addScrollDelta(float delta);
 
         // Callback methods (to be called from GLFW callbacks)
         void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
-        void cursorPosCallback(GLFWwindow* window, double xpos, double ypos);
-        void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+        void cursorPosCallback(GLFWwindow* window, double xPos, double yPos);
+        void scrollCallback(GLFWwindow* window, double xOffset, double yOffset);
         void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
     private:

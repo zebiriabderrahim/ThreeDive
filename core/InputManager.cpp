@@ -19,20 +19,21 @@ namespace s3Dive {
         }
 
         void InputManager::update() {
-            double xpos, ypos;
-            glfwGetCursorPos(window_, &xpos, &ypos);
-            glm::vec2 currentMousePos(static_cast<float>(xpos), static_cast<float>(ypos));
+            double xPos;
+            double yPos;
+            glfwGetCursorPos(window_, &xPos, &yPos);
+            glm::vec2 currentMousePos(static_cast<float>(xPos), static_cast<float>(yPos));
             mouseDelta_ = currentMousePos - lastMousePosition_;
             lastMousePosition_ = currentMousePos;
             mousePosition_ = currentMousePos;
         }
 
-        bool InputManager::isKeyPressed(int key) const {
-            return glfwGetKey(window_, key) == GLFW_PRESS;
+        bool InputManager::isKeyPressed(Key::KeyCode key) const {
+            return glfwGetKey(window_, static_cast<int>(key)) == GLFW_PRESS;
         }
 
-        void InputManager::setMousePosition(double xpos, double ypos) {
-            mousePosition_ = glm::vec2(static_cast<float>(xpos), static_cast<float>(ypos));
+        void InputManager::setMousePosition(double xPos, double yPos) {
+            mousePosition_ = glm::vec2(static_cast<float>(xPos), static_cast<float>(yPos));
         }
 
         void InputManager::setMouseButton(int button, bool pressed) {
@@ -57,12 +58,12 @@ namespace s3Dive {
             setMouseButton(button, action == GLFW_PRESS);
         }
 
-        void InputManager::cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
-            setMousePosition(xpos, ypos);
+        void InputManager::cursorPosCallback(GLFWwindow* window, double xPos, double yPos) {
+            setMousePosition(xPos, yPos);
         }
 
-        void InputManager::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
-            addScrollDelta(static_cast<float>(yoffset));
+        void InputManager::scrollCallback(GLFWwindow* window, double xOffset, double yOffset) {
+            addScrollDelta(static_cast<float>(yOffset));
         }
 
         void InputManager::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
