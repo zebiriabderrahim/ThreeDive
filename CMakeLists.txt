@@ -19,7 +19,7 @@ add_executable(ThreeDive
         assets/simple-shader.vs.glsl
         assets/simple-shader.fs.glsl
         logging/debug_info.h
-        openGLRender/shader.cpp
+        openGLRender/gl_shader.cpp
         openGLRender/shader.h
         openGLRender/gl_shader_program.cpp
         openGLRender/gl_shader_program.h
@@ -51,7 +51,7 @@ add_executable(ThreeDive
         core/memory_and_binding.h
         core/key_codes.h
         core/app.cpp
-        core/app.h core/InputManager.cpp core/InputManager.h core/geo_util.h core/Window.cpp core/Window.h)
+        core/app.h core/InputManager.cpp core/InputManager.h core/geo_util.h core/Window.cpp core/Window.h scene/SceneGrid.cpp scene/SceneGrid.h)
 
 add_custom_command(TARGET ThreeDive
         POST_BUILD
