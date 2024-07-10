@@ -6,34 +6,27 @@
 
 namespace s3Dive {
 
-    TestApplication::TestApplication(const std::shared_ptr<Window>& window): window_(window) {
+    TestApplication::TestApplication(const std::shared_ptr<Window> &window) : window_(window) {
 
         cameraController_ = std::make_unique<CameraController>(
-            std::make_unique<PerspectiveCamera>(45.0f, static_cast<float>(kScreenWidth)
-            / static_cast<float>(kScreenHeight),
-                                                0.1f, 100.0f),
-            CameraSettings{});
+                std::make_unique<PerspectiveCamera>(45.0f, static_cast<float>(kScreenWidth)
+                                                           / static_cast<float>(kScreenHeight),
+                                                    0.1f, 100.0f),
+                CameraSettings{});
 
-
-        // Register camera controller for events
-        window_->addEventListener(EventType::WindowResize, [](const EventVariant& event) {
-            const auto& windowResizeEvent = std::get<WindowResizeEvent>(event);
-            glViewport(0, 0, windowResizeEvent.width, windowResizeEvent.height);
-        });
-
-        window_->addEventListener(EventType::MouseMoved, [this](const EventVariant& event) {
+        window_->addEventListener(EventType::MouseMoved, [this](const EventVariant &event) {
             cameraController_->onEvent(event);
         });
-        window_->addEventListener(EventType::MouseButtonPressed, [this](const EventVariant& event) {
+        window_->addEventListener(EventType::MouseButtonPressed, [this](const EventVariant &event) {
             cameraController_->onEvent(event);
         });
-        window_->addEventListener(EventType::MouseButtonReleased, [this](const EventVariant& event) {
+        window_->addEventListener(EventType::MouseButtonReleased, [this](const EventVariant &event) {
             cameraController_->onEvent(event);
         });
-        window_->addEventListener(EventType::MouseScrolled, [this](const EventVariant& event) {
+        window_->addEventListener(EventType::MouseScrolled, [this](const EventVariant &event) {
             cameraController_->onEvent(event);
         });
-        window_->addEventListener(EventType::WindowResize, [this](const EventVariant& event) {
+        window_->addEventListener(EventType::WindowResize, [this](const EventVariant &event) {
             cameraController_->onEvent(event);
         });
 
@@ -46,10 +39,6 @@ namespace s3Dive {
         initializeGrid();
 
         glEnable(GL_DEPTH_TEST);
-        int screenWidth;
-        int screenHeight;
-        glfwGetFramebufferSize(window_->getNativeWindow(), &screenWidth, &screenHeight);
-        glViewport(0, 0, screenWidth, screenHeight);
 
         gridShader_.initFromFiles("grid.vert", "grid.frag");
 
@@ -71,7 +60,7 @@ namespace s3Dive {
 
     void TestApplication::onRender() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(0.34f, 0.34f, 0.34f, 1.0f);
+        glClearColor(0.266f, 0.26f, 0.25f, 1.0f);
 
         gridShader_.use();
 
@@ -79,7 +68,7 @@ namespace s3Dive {
         glm::mat4 model(1.0f);
         gridShader_.updateShaderUniform("model", glm::value_ptr(model));
 
-        const auto& camera = cameraController_->getCamera();
+        const auto &camera = cameraController_->getCamera();
         glm::mat4 projection = camera.getProjectionMatrix();
         gridShader_.updateShaderUniform("projection", glm::value_ptr(projection));
 
