@@ -44,8 +44,8 @@ namespace s3Dive {
 
 // Event structures
     struct WindowResizeEvent {
-        unsigned int width;
-        unsigned int height;
+         int width;
+         int height;
         [[nodiscard]] EventType getEventType() const { return EventType::WindowResize; }
         [[nodiscard]] EventCategory getCategoryFlags() const { return EventCategoryApplication; }
         [[nodiscard]] std::string toString() const {

@@ -11,7 +11,7 @@ namespace s3Dive {
 
     class Shader {
     public:
-        Shader(GLenum type, const std::string &code);
+        Shader(GLenum type, std::string_view filepath);
         ~Shader();
 
         [[nodiscard]] GLuint getShaderId() const;

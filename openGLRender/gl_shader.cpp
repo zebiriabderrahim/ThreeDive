@@ -12,7 +12,7 @@
 
 namespace s3Dive {
 
-    Shader::Shader(GLenum type, const std::string &filepath) {
+    Shader::Shader(GLenum type, std::string_view filepath) {
         shaderId_ = glCreateShader(type);
         const std::string& source = loadShaderFile(filepath);
         const char *src = source.c_str();
