@@ -14,35 +14,24 @@ namespace s3Dive {
 
     public:
         GLShaderProgram();
-
         ~GLShaderProgram();
 
         void initFromFiles(std::string_view vsPath, std::string_view fsPath) const;
-
         void initFromFiles(std::string_view vsPath, std::string_view gsPath, std::string_view fsPath) const;
 
         void use() const;
-
         void unuse() const;
 
         [[nodiscard]] GLint getAttribLocation(std::string_view name, bool verbose = true);
-
         [[nodiscard]] GLint getUniformLocation(std::string_view name);
 
-        template<typename T>
-        void updateShaderUniform(std::string_view name, T val);
-
-        template<typename T>
-        void updateShaderUniform(std::string_view name, T val1, T val2);
-
-        template<typename T>
-        void updateShaderUniform(std::string_view name, T val1, T val2, T val3);
+        template<typename T> void updateShaderUniform(std::string_view name, T val);
+        template<typename T> void updateShaderUniform(std::string_view name, T val1, T val2);
+        template<typename T>void updateShaderUniform(std::string_view name, T val1, T val2, T val3);
 
     private:
         void checkLinkingErr() const;
-
         void link() const;
-
         void attachShader(const Shader &shader) const;
 
         GLuint programId_;

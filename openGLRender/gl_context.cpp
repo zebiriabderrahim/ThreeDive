@@ -15,7 +15,6 @@ namespace s3Dive {
 
     void GLContext::init() const {
         glfwMakeContextCurrent(window_);
-        glfwSwapInterval(1); // Enable vsync
 
         // Initialize OpenGL loader
         if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {

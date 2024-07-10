@@ -2,6 +2,8 @@
 // Created by ABDERRAHIM ZEBIRI on 2024-06-24.
 //
 #include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
+
 #include <spdlog/spdlog.h>
 #include "gl_shader_program.h"
 
@@ -109,6 +111,12 @@ namespace s3Dive {
     void GLShaderProgram::updateShaderUniform<float>(std::string_view name, float val1, float val2, float val3) {
         GLint location = getUniformLocation(name);
         glUniform3f(location, val1, val2, val3);
+    }
+
+    template<>
+    void GLShaderProgram::updateShaderUniform<glm::vec3>(std::string_view name, glm::vec3 val) {
+        GLint location = getUniformLocation(name);
+        glUniform3f(location, val.x, val.y, val.z);
     }
 
     template<>

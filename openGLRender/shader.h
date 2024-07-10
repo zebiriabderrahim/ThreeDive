@@ -5,12 +5,13 @@
 #ifndef THREEDIVE_SHADER_H
 #define THREEDIVE_SHADER_H
 
+#include <string>
+
 namespace s3Dive {
 
     class Shader {
     public:
-        Shader(GLenum type, const std::string &code);
-
+        Shader(GLenum type, std::string_view filepath);
         ~Shader();
 
         [[nodiscard]] GLuint getShaderId() const;
@@ -19,6 +20,7 @@ namespace s3Dive {
 
     private:
         void checkShaderError() const;
+
         GLuint shaderId_;
     };
 

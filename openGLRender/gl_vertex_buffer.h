@@ -6,6 +6,7 @@
 #define THREEDIVE_GL_VERTEX_BUFFER_H
 
 #include <vector>
+#include <glm/glm.hpp>
 #include "gl_vertex_buffer_layout.h"
 
 
@@ -15,15 +16,14 @@ namespace s3Dive {
 
     public:
         explicit GLVertexBuffer(const std::vector<float> &data);
+        explicit GLVertexBuffer(const std::vector<glm::vec3> &data);
 
         ~GLVertexBuffer();
 
         void bind() const;
-
         void unbind() const;
 
         void setLayout(const GLVertexBufferLayout &layout);
-
         GLVertexBufferLayout &getLayout();
 
     private:

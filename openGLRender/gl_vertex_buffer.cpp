@@ -14,6 +14,13 @@ namespace s3Dive {
                      GL_STATIC_DRAW);
     }
 
+    GLVertexBuffer::GLVertexBuffer(const std::vector<glm::vec3> &data) {
+        glGenBuffers(1, &rendererID_);
+        glBindBuffer(GL_ARRAY_BUFFER, rendererID_);
+        glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(data.size() * sizeof(glm::vec3)), data.data(),
+                     GL_STATIC_DRAW);
+    }
+
     GLVertexBuffer::~GLVertexBuffer() {
         glDeleteBuffers(1, &rendererID_);
     }
@@ -33,5 +40,4 @@ namespace s3Dive {
     GLVertexBufferLayout &GLVertexBuffer::getLayout() {
         return layout_;
     }
-
 } // s3Dive

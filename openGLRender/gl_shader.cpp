@@ -12,7 +12,7 @@
 
 namespace s3Dive {
 
-    Shader::Shader(GLenum type, const std::string &filepath) {
+    Shader::Shader(GLenum type, std::string_view filepath) {
         shaderId_ = glCreateShader(type);
         const std::string& source = loadShaderFile(filepath);
         const char *src = source.c_str();
@@ -47,7 +47,7 @@ namespace s3Dive {
 
     std::string Shader::loadShaderFile(std::string_view filepath) {
         try {
-            std::ifstream stream(filepath);
+            std::ifstream stream(filepath.data());
             if (!stream.is_open()) {
                 throw std::ifstream::failure("Failed to open file: " + std::string(filepath));
             }
