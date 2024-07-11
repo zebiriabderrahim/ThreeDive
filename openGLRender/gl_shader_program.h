@@ -5,7 +5,7 @@
 #ifndef THREEDIVE_GL_SHADER_PROGRAM_H
 #define THREEDIVE_GL_SHADER_PROGRAM_H
 
-#include "shader.h"
+#include "gl_shader.h"
 
 
 namespace s3Dive {
@@ -32,7 +32,7 @@ namespace s3Dive {
     private:
         void checkLinkingErr() const;
         void link() const;
-        void attachShader(const Shader &shader) const;
+        void attachShader(const GLShader &shader) const;
 
         GLuint programId_;
         std::unordered_map<std::string, GLint> uniformLocationCache_;

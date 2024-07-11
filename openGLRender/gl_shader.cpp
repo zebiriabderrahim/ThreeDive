@@ -7,12 +7,12 @@
 #include <glad/glad.h>
 #include <spdlog/spdlog.h>
 
-#include "shader.h"
+#include "gl_shader.h"
 
 
 namespace s3Dive {
 
-    Shader::Shader(GLenum type, std::string_view filepath) {
+    GLShader::GLShader(GLenum type, std::string_view filepath) {
         shaderId_ = glCreateShader(type);
         const std::string& source = loadShaderFile(filepath);
         const char *src = source.c_str();
@@ -21,15 +21,15 @@ namespace s3Dive {
         checkShaderError();
     }
 
-    Shader::~Shader() {
+    GLShader::~GLShader() {
         glDeleteShader(shaderId_);
     }
 
-    GLuint Shader::getShaderId() const {
+    GLuint GLShader::getShaderId() const {
         return shaderId_;
     }
 
-    void Shader::checkShaderError() const {
+    void GLShader::checkShaderError() const {
         int result;
         glGetShaderiv(shaderId_, GL_COMPILE_STATUS, &result);
         if (result == GL_FALSE) {
@@ -45,7 +45,7 @@ namespace s3Dive {
     }
 
 
-    std::string Shader::loadShaderFile(std::string_view filepath) {
+    std::string GLShader::loadShaderFile(std::string_view filepath) {
         try {
             std::ifstream stream(filepath.data());
             if (!stream.is_open()) {

@@ -2,17 +2,17 @@
 // Created by ABDERRAHIM ZEBIRI on 2024-06-22.
 //
 
-#ifndef THREEDIVE_SHADER_H
-#define THREEDIVE_SHADER_H
+#ifndef THREEDIVE_GL_SHADER_H
+#define THREEDIVE_GL_SHADER_H
 
 #include <string>
 
 namespace s3Dive {
 
-    class Shader {
+    class GLShader {
     public:
-        Shader(GLenum type, std::string_view filepath);
-        ~Shader();
+        GLShader(GLenum type, std::string_view filepath);
+        ~GLShader();
 
         [[nodiscard]] GLuint getShaderId() const;
 
@@ -26,4 +26,4 @@ namespace s3Dive {
 
 } // s3Dive
 
-#endif //THREEDIVE_SHADER_H
+#endif //THREEDIVE_GL_SHADER_H

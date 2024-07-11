@@ -18,8 +18,8 @@ namespace s3Dive {
     }
 
     void GLShaderProgram::initFromFiles(std::string_view vsPath, std::string_view fsPath) const {
-        auto vertexShader = Shader(GL_VERTEX_SHADER, vsPath.data());
-        auto fragmentShader = Shader(GL_FRAGMENT_SHADER, fsPath.data());
+        auto vertexShader = GLShader(GL_VERTEX_SHADER, vsPath.data());
+        auto fragmentShader = GLShader(GL_FRAGMENT_SHADER, fsPath.data());
 
         attachShader(vertexShader);
         attachShader(fragmentShader);
@@ -31,9 +31,9 @@ namespace s3Dive {
     void
     GLShaderProgram::initFromFiles(std::string_view vsPath, std::string_view gsPath, std::string_view fsPath) const {
 
-        auto vertexShader = Shader(GL_VERTEX_SHADER, Shader::loadShaderFile(vsPath.data()));
-        auto geometryShader = Shader(GL_GEOMETRY_SHADER, Shader::loadShaderFile(gsPath.data()));
-        auto fragmentShader = Shader(GL_FRAGMENT_SHADER, Shader::loadShaderFile(fsPath.data()));
+        auto vertexShader = GLShader(GL_VERTEX_SHADER, GLShader::loadShaderFile(vsPath.data()));
+        auto geometryShader = GLShader(GL_GEOMETRY_SHADER, GLShader::loadShaderFile(gsPath.data()));
+        auto fragmentShader = GLShader(GL_FRAGMENT_SHADER, GLShader::loadShaderFile(fsPath.data()));
 
         attachShader(vertexShader);
         attachShader(geometryShader);
@@ -55,7 +55,7 @@ namespace s3Dive {
         checkLinkingErr();
     }
 
-    void GLShaderProgram::attachShader(const Shader &shader) const {
+    void GLShaderProgram::attachShader(const GLShader &shader) const {
         glAttachShader(programId_, shader.getShaderId());
     }
 
