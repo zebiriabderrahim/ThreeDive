@@ -8,6 +8,7 @@ find_package(imgui REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(stb REQUIRED)
 find_package(glm REQUIRED)
+find_package(freetype REQUIRED)
 
 add_executable(ThreeDive
         main.cpp
@@ -20,7 +21,7 @@ add_executable(ThreeDive
         assets/simple-shader.fs.glsl
         logging/debug_info.h
         openGLRender/gl_shader.cpp
-        openGLRender/shader.h
+        openGLRender/gl_shader.h
         openGLRender/gl_shader_program.cpp
         openGLRender/gl_shader_program.h
         openGLRender/gl_vertex_array.cpp
@@ -51,7 +52,14 @@ add_executable(ThreeDive
         core/memory_and_binding.h
         core/key_codes.h
         core/app.cpp
-        core/app.h core/InputManager.cpp core/InputManager.h core/geo_util.h core/Window.cpp core/Window.h scene/SceneGrid.cpp scene/SceneGrid.h)
+        core/app.h
+        core/geo_util.h
+        core/Window.cpp
+        core/Window.h
+        scene/SceneGrid.cpp
+        scene/SceneGrid.h
+        scene/ViewCube.cpp
+        scene/ViewCube.h)
 
 add_custom_command(TARGET ThreeDive
         POST_BUILD
@@ -63,7 +71,7 @@ add_custom_command(TARGET ThreeDive
         )
 
 target_compile_definitions(ThreeDive PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW)
-target_link_libraries(ThreeDive imgui::imgui glfw glad::glad spdlog::spdlog stb::stb glm::glm)
+target_link_libraries(ThreeDive imgui::imgui glfw glad::glad spdlog::spdlog stb::stb glm::glm freetype)
 
 #add_subdirectory(tests)
 
