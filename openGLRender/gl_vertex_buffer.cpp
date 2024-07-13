@@ -1,8 +1,6 @@
 //
 // Created by ABDERRAHIM ZEBIRI on 2024-06-25.
 //
-#include <vector>
-#include <glad/glad.h>
 
 #include "gl_vertex_buffer.h"
 

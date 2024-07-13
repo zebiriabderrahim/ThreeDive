@@ -1,10 +1,9 @@
 //
 // Created by ABDERRAHIM ZEBIRI on 2024-06-24.
 //
-#include <glad/glad.h>
-#include <glm/gtc/type_ptr.hpp>
-
 #include <spdlog/spdlog.h>
+
+#include "gl_shader.h"
 #include "gl_shader_program.h"
 
 namespace s3Dive {

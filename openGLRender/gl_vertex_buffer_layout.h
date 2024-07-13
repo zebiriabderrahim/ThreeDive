@@ -1,14 +1,17 @@
 //
 // Created by ABDERRAHIM ZEBIRI on 2024-06-24.
 //
+#pragma once
 
 #ifndef THREEDIVE_GL_VERTEX_BUFFER_LAYOUT_H
 #define THREEDIVE_GL_VERTEX_BUFFER_LAYOUT_H
 
-#include <stdexcept>
+#include <glad/glad.h>
 #include <vector>
+#include <stdexcept>
 
 namespace s3Dive {
+
     struct VertexBufferElement {
         GLuint type;
         GLint count;
@@ -44,7 +47,6 @@ namespace s3Dive {
         std::vector<VertexBufferElement> elements_;
         unsigned int stride_ = 0;
     };
-
 
 } // s3Dive
 

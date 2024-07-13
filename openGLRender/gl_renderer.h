@@ -1,14 +1,14 @@
 //
 // Created by ABDERRAHIM ZEBIRI on 2024-06-29.
 //
+#pragma once
 
 #ifndef THREEDIVE_GL_RENDERER_H
 #define THREEDIVE_GL_RENDERER_H
 
-#include "gl_vertex_array.h"
-
-
 namespace s3Dive {
+
+    class GLVertexArray;
 
     class GLRenderer {
     public:
@@ -24,7 +24,6 @@ namespace s3Dive {
 
         void drawIndexed(const GLVertexArray &vao, GLuint indexCount) const;
         void drawLines(const GLVertexArray &vao, GLint indexCount) const;
-
     };
 
 } // s3Dive

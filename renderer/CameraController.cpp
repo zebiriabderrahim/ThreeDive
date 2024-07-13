@@ -1,6 +1,5 @@
 #include "CameraController.h"
 #include <algorithm>
-#include "../core/Event.h"
 
 
 namespace s3Dive {

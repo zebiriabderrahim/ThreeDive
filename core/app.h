@@ -8,8 +8,6 @@
 
 #include <memory>
 #include <vector>
-#include <glm/glm.hpp>
-#include <GLFW/glfw3.h>
 
 #include "../renderer/ICamera.h"
 #include "../renderer/perspective_camera.h"
@@ -17,8 +15,6 @@
 #include "../openGLRender/gl_shader_program.h"
 #include "../openGLRender/gl_vertex_array.h"
 #include "../openGLRender/gl_vertex_buffer.h"
-#include "../openGLRender/gl_vertex_buffer_layout.h"
-#include "../openGLRender/gl_renderer.h"
 #include "Window.h"
 
 namespace s3Dive {
@@ -41,7 +37,6 @@ namespace s3Dive {
         SharedPtr<Window> window_;
         UniquePtr<CameraController> cameraController_;
         GLShaderProgram gridShader_;
-        GLRenderer renderer_;
         GLVertexArray vao_;
         std::shared_ptr<GLVertexBuffer> vbo_;
 

@@ -3,9 +3,9 @@
 //
 
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <spdlog/spdlog.h>
+#include <glm/gtc/type_ptr.hpp>
 
+#include "gl_vertex_array.h"
 #include "gl_renderer.h"
 
 

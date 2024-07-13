@@ -1,14 +1,21 @@
 //
 // Created by ABDERRAHIM ZEBIRI on 2024-06-24.
 //
+#pragma once
 
 #ifndef THREEDIVE_GL_SHADER_PROGRAM_H
 #define THREEDIVE_GL_SHADER_PROGRAM_H
 
-#include "gl_shader.h"
 
+#include <string>
+#include <string_view>
+#include <unordered_map>
+#include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace s3Dive {
+
+    class GLShader;
 
     class GLShaderProgram {
 

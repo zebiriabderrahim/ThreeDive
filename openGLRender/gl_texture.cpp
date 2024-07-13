@@ -1,16 +1,15 @@
 //
 // Created by ABDERRAHIM ZEBIRI on 2024-06-26.
 //
-#include <glad/glad.h>
 #include <spdlog/spdlog.h>
-
+#include <glad/glad.h>
 #define STB_IMAGE_IMPLEMENTATION
-
 #include <stb_image.h>
 
 #include "gl_texture.h"
 
 namespace s3Dive {
+
     GLTexture::GLTexture(std::string_view path) {
 
         stbi_set_flip_vertically_on_load(1);

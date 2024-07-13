@@ -3,6 +3,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "geo_util.h"
 #include "Window.h"
+#include "../renderer/RenderCommand.h"
 
 namespace s3Dive {
 
@@ -35,6 +36,7 @@ namespace s3Dive {
     TestApplication::~TestApplication() = default;
 
     bool TestApplication::initialize() {
+        RenderCommand::init();
         initializeCamera();
         initializeGrid();
 
@@ -79,7 +81,7 @@ namespace s3Dive {
         gridShader_.updateShaderUniform("detailVisibility2", cameraController_->getDetailVisibility2());
 
 
-        renderer_.drawLines(vao_, static_cast<GLint>(gridVertices_.size() / 8));
+        RenderCommand::drawLines(vao_, static_cast<GLint>(gridVertices_.size() / 8));
     }
 
     void TestApplication::initializeCamera() {

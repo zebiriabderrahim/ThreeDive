@@ -1,9 +1,12 @@
 //
 // Created by ABDERRAHIM ZEBIRI on 2024-06-29.
 //
+#pragma once
 
 #ifndef THREEDIVE_GL_CONTEXT_H
 #define THREEDIVE_GL_CONTEXT_H
+
+#include <GLFW/glfw3.h>
 
 namespace s3Dive {
 
@@ -13,7 +16,6 @@ namespace s3Dive {
         explicit GLContext(GLFWwindow *window);
 
         void init() const;
-
         void swapBuffers() const;
 
     private:

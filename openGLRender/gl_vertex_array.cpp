@@ -2,11 +2,8 @@
 // Created by ABDERRAHIM ZEBIRI on 2024-06-24.
 //
 
-#include <glad/glad.h>
-
 #include "gl_vertex_array.h"
 #include "gl_vertex_buffer_layout.h"
-
 
 
 namespace s3Dive {
@@ -18,7 +15,7 @@ namespace s3Dive {
         glDeleteVertexArrays(1, &rendererID_);
     }
 
-    void GLVertexArray::addVertexBuffer(const VertexBufferObjectRef &vbo) {
+    void GLVertexArray::addVertexBuffer(const std::shared_ptr<GLVertexBuffer> &vbo) {
         bind();
         vbo->bind();
 
@@ -47,7 +44,7 @@ namespace s3Dive {
     }
 
 
-    void GLVertexArray::setIndexBuffer(const IndexBufferObjectRef &ibo) {
+    void GLVertexArray::setIndexBuffer(const std::shared_ptr<GLIndexBuffer> &ibo) {
         bind();
         ibo->bind();
         indexBuffer_ = ibo;

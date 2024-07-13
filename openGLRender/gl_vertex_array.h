@@ -1,6 +1,7 @@
 //
 // Created by ABDERRAHIM ZEBIRI on 2024-06-24.
 //
+#pragma once
 
 #ifndef THREEDIVE_GL_VERTEX_ARRAY_H
 #define THREEDIVE_GL_VERTEX_ARRAY_H
@@ -8,14 +9,10 @@
 #include <vector>
 #include <memory>
 
-#include "gl_index_buffer.h"
 #include "gl_vertex_buffer.h"
-
+#include "gl_index_buffer.h"
 
 namespace s3Dive {
-
-    using VertexBufferObjectRef = std::shared_ptr<GLVertexBuffer>;
-    using IndexBufferObjectRef = std::shared_ptr<GLIndexBuffer>;
 
     class GLVertexArray {
 
@@ -26,16 +23,16 @@ namespace s3Dive {
         void bind() const;
         void unbind() const;
 
-        void addVertexBuffer(const VertexBufferObjectRef &vbo);
-        void setIndexBuffer(const IndexBufferObjectRef &ibo);
+        void addVertexBuffer(const std::shared_ptr<GLVertexBuffer> &vbo);
+        void setIndexBuffer(const std::shared_ptr<GLIndexBuffer> &ibo);
 
-        [[nodiscard]] const std::vector<VertexBufferObjectRef> &getVertexBuffers() const { return vertexBuffers_; }
-        [[nodiscard]] const IndexBufferObjectRef &getIndexBuffer() const { return indexBuffer_; }
+        [[nodiscard]] const std::vector<std::shared_ptr<GLVertexBuffer>> &getVertexBuffers() const { return vertexBuffers_; }
+        [[nodiscard]] const std::shared_ptr<GLIndexBuffer> &getIndexBuffer() const { return indexBuffer_; }
 
     private:
         GLuint rendererID_{};
-        std::vector<VertexBufferObjectRef> vertexBuffers_;
-        IndexBufferObjectRef indexBuffer_;
+        std::vector<std::shared_ptr<GLVertexBuffer>> vertexBuffers_;
+        std::shared_ptr<GLIndexBuffer> indexBuffer_;
 
     };
 

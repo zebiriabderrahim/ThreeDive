@@ -5,7 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include "ICamera.h"
-#include "../core/Event.h"
+#include "../core/event.h"
 
 namespace s3Dive {
 

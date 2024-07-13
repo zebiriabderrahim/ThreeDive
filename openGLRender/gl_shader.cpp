@@ -3,8 +3,6 @@
 //
 #include <fstream>
 #include <sstream>
-#include <string>
-#include <glad/glad.h>
 #include <spdlog/spdlog.h>
 
 #include "gl_shader.h"

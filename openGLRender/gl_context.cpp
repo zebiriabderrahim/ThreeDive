@@ -2,7 +2,6 @@
 // Created by ABDERRAHIM ZEBIRI on 2024-06-29.
 //
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include <spdlog/spdlog.h>
 
 #include "gl_context.h"

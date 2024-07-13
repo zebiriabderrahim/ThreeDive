@@ -1,10 +1,8 @@
 //
 // Created by ABDERRAHIM ZEBIRI on 2024-06-24.
 //
-#include <vector>
 
 #include <glad/glad.h>
-
 #include "gl_vertex_buffer_layout.h"
 
 namespace s3Dive {

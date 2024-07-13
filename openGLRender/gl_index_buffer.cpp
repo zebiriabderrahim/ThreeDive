@@ -1,7 +1,7 @@
 //
 // Created by ABDERRAHIM ZEBIRI on 2024-06-26.
 //
-#include <vector>
+
 #include <glad/glad.h>
 
 #include "gl_index_buffer.h"

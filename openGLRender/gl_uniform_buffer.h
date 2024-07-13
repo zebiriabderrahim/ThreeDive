@@ -1,6 +1,7 @@
 //
 // Created by ABDERRAHIM ZEBIRI on 2024-06-28.
 //
+#pragma once
 
 #ifndef THREEDIVE_GL_UNIFORM_BUFFER_H
 #define THREEDIVE_GL_UNIFORM_BUFFER_H
