@@ -58,8 +58,9 @@ add_executable(ThreeDive
         core/Window.h
         scene/SceneGrid.cpp
         scene/SceneGrid.h
-        scene/ViewCube.cpp
-        scene/ViewCube.h)
+#        scene/ViewCube.cpp
+#        scene/ViewCube.h
+        renderer/RenderCommand.cpp renderer/RenderCommand.h)
 
 add_custom_command(TARGET ThreeDive
         POST_BUILD
