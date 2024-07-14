@@ -1,7 +1,6 @@
-#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include "SceneGrid.h"
-#include "../openGLRender/gl_renderer.h"
+#include "../platform/openGLRender/gl_renderer.h"
 
 
 namespace s3Dive {

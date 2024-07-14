@@ -12,9 +12,9 @@
 #include "../renderer/ICamera.h"
 #include "../renderer/perspective_camera.h"
 #include "../renderer/CameraController.h"
-#include "../openGLRender/gl_shader_program.h"
-#include "../openGLRender/gl_vertex_array.h"
-#include "../openGLRender/gl_vertex_buffer.h"
+#include "../platform/openGLRender/gl_shader_program.h"
+#include "../platform/openGLRender/gl_vertex_array.h"
+#include "../platform/openGLRender/gl_vertex_buffer.h"
 #include "Window.h"
 
 namespace s3Dive {

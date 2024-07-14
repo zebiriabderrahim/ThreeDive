@@ -11,7 +11,6 @@
 #include <GLFW/glfw3.h>
 #include "memory_and_binding.h"
 #include "event.h"
-#include "../openGLRender/gl_context.h"
 
 namespace s3Dive {
 
@@ -49,10 +48,7 @@ namespace s3Dive {
         [[nodiscard]] bool isVSync() const { return vSync_; }
         [[nodiscard]] bool shouldClose() const;
 
-        void addEventListener(EventType type, const EventCallbackFn& callback) {
-            eventDispatcher_.addEventListener(type, callback);
-        }
-
+        void addEventListener(EventType type, const EventCallbackFn& callback);
     private:
         void init(const WindowProps& props);
         void setGlfwCallbacks();
@@ -60,7 +56,6 @@ namespace s3Dive {
         static void glfwErrorCallback(int error, const char* description);
 
         GLFWwindow* window_{nullptr};
-        UniquePtr<GLContext> context_;
         EventDispatcher eventDispatcher_;
         EventQueue eventQueue_;
 

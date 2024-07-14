@@ -6,8 +6,8 @@
 #define THREEDIVE_RENDERCOMMAND_H
 
 #include <glm/glm.hpp>
-#include "../openGLRender/gl_vertex_array.h"
-#include "../openGLRender/gl_renderer.h"
+#include "../platform/openGLRender/gl_vertex_array.h"
+#include "../platform/openGLRender/gl_renderer.h"
 
 
 namespace s3Dive {

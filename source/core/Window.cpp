@@ -1,5 +1,8 @@
-#include "Window.h"
 #include <spdlog/spdlog.h>
+
+#include "../logging/debug_info.h"
+#include "Window.h"
+
 
 namespace s3Dive {
 
@@ -43,8 +46,15 @@ namespace s3Dive {
         }
         ++s_GLFWWindowCount;
 
-        context_ = std::make_unique<GLContext>(window_);
-        context_->init();
+        glfwMakeContextCurrent(window_);
+
+        // Initialize OpenGL loader
+        if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
+            spdlog::error("Failed to initialize OpenGL context");
+            return;
+        }
+
+        s3Dive::debug::printGLInfo();
 
         glfwSetWindowUserPointer(window_, this);
         setVSync(true);
@@ -109,7 +119,7 @@ namespace s3Dive {
 
         glfwPollEvents();
         processEvents();
-        context_->swapBuffers();
+        glfwSwapBuffers(window_);
     }
 
     void Window::processEvents() {
@@ -131,6 +141,10 @@ namespace s3Dive {
 
     void Window::glfwErrorCallback(int error, const char *description) {
         spdlog::error("GLFW Error ({0}): {1}", error, description);
+    }
+
+    void Window::addEventListener(EventType type, const Window::EventCallbackFn &callback) {
+            eventDispatcher_.addEventListener(type, callback);
     }
 
 } // namespace s3Dive
