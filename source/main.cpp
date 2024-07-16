@@ -7,7 +7,7 @@
 int main(int, char **) {
     auto window = std::make_shared<s3Dive::Window>();
 
-    if (s3Dive::TestApplication app(window); app.initialize()) {
+    if (s3Dive::App app(window); app.initialize()) {
         app.run();
     }
 

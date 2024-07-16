@@ -1,7 +1,7 @@
 #include <spdlog/spdlog.h>
 
 #include "../logging/debug_info.h"
-#include "Window.h"
+#include "window.h"
 
 
 namespace s3Dive {
@@ -101,6 +101,8 @@ namespace s3Dive {
             auto* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
             win->eventQueue_.enqueueEvent(WindowCloseEvent{});
         });
+
+        glfwSetErrorCallback(glfwErrorCallback);
     }
 
     void Window::shutdown() {

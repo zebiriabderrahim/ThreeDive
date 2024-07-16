@@ -23,7 +23,7 @@ namespace s3Dive {
             int height;
 
             explicit WindowProps(std::string  title = "3Dive Engine",
-                        int width = 1280,
+                        int width = 960,
                         int height = 720)
                 : title(std::move(title)), width(width), height(height) {}
         };
