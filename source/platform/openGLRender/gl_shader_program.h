@@ -10,8 +10,9 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
-#include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
+
+#include "gl_shader.h"
 
 namespace s3Dive {
 

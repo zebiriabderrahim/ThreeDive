@@ -17,8 +17,16 @@ namespace s3Dive {
         glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
     }
 
-    void GLRenderer::clear() const {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    void GLRenderer::clear(GLRenderer::BufferBit bit) const {
+        glClear(static_cast<GLbitfield>(bit));
+    }
+
+    void GLRenderer::clear(GLRenderer::BufferBit bit1, GLRenderer::BufferBit bit2) const {
+        glClear(static_cast<GLbitfield>(bit1) | static_cast<GLbitfield>(bit2));
+    }
+
+    void GLRenderer::clear(GLRenderer::BufferBit bit1, GLRenderer::BufferBit bit2, GLRenderer::BufferBit bit3) const {
+        glClear(static_cast<GLbitfield>(bit1) | static_cast<GLbitfield>(bit2) | static_cast<GLbitfield>(bit3));
     }
 
     void GLRenderer::setViewport(int x, int y, int width, int height) const {
@@ -34,13 +42,13 @@ namespace s3Dive {
     }
 
     void GLRenderer::drawIndexed(const GLVertexArray &vao, GLuint indexCount) const {
-        vao.bind();
         auto count = indexCount ? indexCount : vao.getIndexBuffer()->getCount();
         glDrawElements(GL_TRIANGLES, static_cast<GLint>(count), GL_UNSIGNED_INT, nullptr);
     }
 
-    void GLRenderer::drawLines(const GLVertexArray &vao, GLint indexCount) const {
-        vao.bind();
+    void GLRenderer::drawLines(GLint indexCount) const {
         glDrawArrays(GL_LINES, 0, indexCount);
     }
+
+
 } // s3Dive

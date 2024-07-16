@@ -3,7 +3,6 @@
 //
 #include <spdlog/spdlog.h>
 
-#include "gl_shader.h"
 #include "gl_shader_program.h"
 
 namespace s3Dive {
