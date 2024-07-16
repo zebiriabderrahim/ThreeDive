@@ -11,8 +11,16 @@ namespace s3Dive {
         getRenderer().init();
     }
 
-    void RenderCommand::clear() noexcept {
-        getRenderer().clear();
+    void RenderCommand::clear(GLRenderer::BufferBit bit) noexcept {
+        getRenderer().clear(bit);
+    }
+
+    void RenderCommand::clear(GLRenderer::BufferBit bit1, GLRenderer::BufferBit bit2) noexcept {
+        getRenderer().clear(bit1, bit2);
+    }
+
+    void RenderCommand::clear(GLRenderer::BufferBit bit1, GLRenderer::BufferBit bit2, GLRenderer::BufferBit bit3) noexcept {
+        getRenderer().clear(bit1, bit2, bit3);
     }
 
     void RenderCommand::setViewport(int x, int y, int width, int height) noexcept {
@@ -27,16 +35,18 @@ namespace s3Dive {
         getRenderer().setLineWidth(width);
     }
 
-    void RenderCommand::drawIndexed(const GLVertexArray& vao, GLsizei indexCount) noexcept {
-        getRenderer().drawIndexed(vao, indexCount);
+    void RenderCommand::drawIndexed(const GLVertexArray& vao) noexcept {
+        vao.bind();
+        getRenderer().drawIndexed(vao);
     }
 
      void RenderCommand::drawLines(const GLVertexArray& vao, GLsizei indexCount) noexcept {
-        getRenderer().drawLines(vao, indexCount);
+        vao.bind();
+        getRenderer().drawLines(indexCount);
     }
 
     GLRenderer &RenderCommand::getRenderer() noexcept {
-        static auto rendererApi = MakeUnique<GLRenderer>();
+        static const auto rendererApi = MakeUnique<GLRenderer>();
         return *rendererApi;
     }
 } // s3Dive
