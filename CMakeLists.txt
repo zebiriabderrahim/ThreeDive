@@ -9,6 +9,7 @@ find_package(spdlog REQUIRED)
 find_package(stb REQUIRED)
 find_package(glm REQUIRED)
 find_package(freetype REQUIRED)
+find_package(assimp REQUIRED)
 
 add_executable(ThreeDive
         source/main.cpp
@@ -52,13 +53,17 @@ add_executable(ThreeDive
         source/core/app.cpp
         source/core/app.h
         source/core/geo_util.h
-        source/core/Window.cpp
-        source/core/Window.h
+        source/core/window.cpp
+        source/core/window.h
         source/scene/SceneGrid.cpp
         source/scene/SceneGrid.h
 #        scene/ViewCube.cpp
 #        scene/ViewCube.h
-        source/renderer/RenderCommand.cpp source/renderer/RenderCommand.h)
+        source/renderer/RenderCommand.cpp
+        source/renderer/RenderCommand.h
+        source/core/event_type.h
+        source/scene/Model.cpp
+        source/scene/Model.h source/renderer/Renderer.cpp source/renderer/Renderer.h)
 
 add_custom_command(TARGET ThreeDive
         POST_BUILD
@@ -70,7 +75,7 @@ add_custom_command(TARGET ThreeDive
         )
 
 target_compile_definitions(ThreeDive PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW)
-target_link_libraries(ThreeDive imgui::imgui glfw glad::glad spdlog::spdlog stb::stb glm::glm freetype)
+target_link_libraries(ThreeDive imgui::imgui glfw glad::glad spdlog::spdlog stb::stb glm::glm freetype assimp::assimp)
 
 #add_subdirectory(tests)
 
