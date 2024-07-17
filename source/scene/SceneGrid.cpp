@@ -18,7 +18,7 @@ namespace s3Dive {
         shaderProgram.use();
         VAO_.bind();
         GLRenderer renderer;
-        renderer.drawLines(VAO_, vertexCount_);
+        renderer.drawLines(vertexCount_);
         shaderProgram.updateShaderUniform("detailVisibility1", cameraController->getDetailVisibility1());
         shaderProgram.updateShaderUniform("detailVisibility2", cameraController->getDetailVisibility2());
         VAO_.unbind();

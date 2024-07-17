@@ -15,17 +15,17 @@
 #include "../platform/openGLRender/gl_shader_program.h"
 #include "../platform/openGLRender/gl_vertex_array.h"
 #include "../platform/openGLRender/gl_vertex_buffer.h"
-#include "Window.h"
+#include "window.h"
 
 namespace s3Dive {
 
-    class TestApplication {
+    class App {
     public:
-         explicit TestApplication(const std::shared_ptr<Window>& window);
-        ~TestApplication();
+         explicit App(const std::shared_ptr<Window>& window);
+        ~App();
 
-        TestApplication(const TestApplication&) = delete;
-        TestApplication& operator=(const TestApplication&) = delete;
+        App(const App&) = delete;
+        App& operator=(const App&) = delete;
 
         bool initialize();
         void run();

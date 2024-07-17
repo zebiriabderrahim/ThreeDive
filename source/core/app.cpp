@@ -2,12 +2,11 @@
 #include "InputManager.h"
 #include <glm/gtc/type_ptr.hpp>
 #include "geo_util.h"
-#include "Window.h"
 #include "../renderer/RenderCommand.h"
 
 namespace s3Dive {
 
-    TestApplication::TestApplication(const std::shared_ptr<Window> &window) : window_(window) {
+    App::App(const std::shared_ptr<Window> &window) : window_(window) {
 
         cameraController_ = std::make_unique<CameraController>(
                 std::make_unique<PerspectiveCamera>(45.0f, static_cast<float>(kScreenWidth)
@@ -33,9 +32,9 @@ namespace s3Dive {
 
     }
 
-    TestApplication::~TestApplication() = default;
+    App::~App() = default;
 
-    bool TestApplication::initialize() {
+    bool App::initialize() {
         RenderCommand::init();
         initializeCamera();
         initializeGrid();
@@ -47,7 +46,7 @@ namespace s3Dive {
         return true;
     }
 
-    void TestApplication::run() {
+    void App::run() {
         float lastFrame = 0.0f;
         while (!glfwWindowShouldClose(window_.get()->getNativeWindow())) {
             auto currentFrame = static_cast<float>(glfwGetTime());
@@ -60,7 +59,7 @@ namespace s3Dive {
         }
     }
 
-    void TestApplication::onRender() {
+    void App::onRender() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.266f, 0.26f, 0.25f, 1.0f);
 
@@ -84,7 +83,7 @@ namespace s3Dive {
         RenderCommand::drawLines(vao_, static_cast<GLint>(gridVertices_.size() / 8));
     }
 
-    void TestApplication::initializeCamera() {
+    void App::initializeCamera() {
         auto camera = std::make_unique<PerspectiveCamera>(45.0f,
                                                           static_cast<float>(kScreenWidth)
                                                           / static_cast<float>(kScreenHeight),
@@ -98,7 +97,7 @@ namespace s3Dive {
     }
 
 
-    void TestApplication::initializeGrid() {
+    void App::initializeGrid() {
         constexpr float gridSize = 10.0f;
         constexpr float gridStep = 2.0f;
         constexpr float extensionSize = 4.0f;
