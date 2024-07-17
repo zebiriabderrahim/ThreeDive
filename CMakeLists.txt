@@ -8,9 +8,11 @@ find_package(imgui REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(stb REQUIRED)
 find_package(glm REQUIRED)
+find_package(freetype REQUIRED)
+find_package(assimp REQUIRED)
 
 add_executable(ThreeDive
-        main.cpp
+        source/main.cpp
         bindings/imgui_impl_glfw.cpp
         bindings/imgui_impl_glfw.h
         bindings/imgui_impl_opengl3.cpp
@@ -18,40 +20,50 @@ add_executable(ThreeDive
         bindings/imgui_impl_opengl3_loader.h
         assets/simple-shader.vs.glsl
         assets/simple-shader.fs.glsl
-        logging/debug_info.h
-        openGLRender/gl_shader.cpp
-        openGLRender/shader.h
-        openGLRender/gl_shader_program.cpp
-        openGLRender/gl_shader_program.h
-        openGLRender/gl_vertex_array.cpp
-        openGLRender/gl_vertex_array.h
-        openGLRender/gl_vertex_buffer_layout.cpp
-        openGLRender/gl_vertex_buffer_layout.h
-        openGLRender/gl_vertex_buffer.cpp
-        openGLRender/gl_vertex_buffer.h
-        openGLRender/gl_index_buffer.cpp
-        openGLRender/gl_index_buffer.h
-        openGLRender/gl_texture.cpp
-        openGLRender/gl_texture.h
-        openGLRender/gl_uniform_buffer.cpp
-        openGLRender/gl_uniform_buffer.h
-        openGLRender/gl_context.cpp
-        openGLRender/gl_context.h
-        openGLRender/gl_renderer.cpp
-        openGLRender/gl_renderer.h
-        renderer/ortho_camera.cpp
-        renderer/ortho_camera.h
-        renderer/ICamera.h
-        renderer/perspective_camera.cpp
-        renderer/perspective_camera.h
-        renderer/CameraController.cpp
-        renderer/CameraController.h
-        scene/scene_node.cpp
-        scene/scene_node.h core/event.h
-        core/memory_and_binding.h
-        core/key_codes.h
-        core/app.cpp
-        core/app.h core/InputManager.cpp core/InputManager.h core/geo_util.h core/Window.cpp core/Window.h scene/SceneGrid.cpp scene/SceneGrid.h)
+        source/logging/debug_info.h
+        source/platform/openGLRender/gl_shader.cpp
+        source/platform/openGLRender/gl_shader.h
+        source/platform/openGLRender/gl_shader_program.cpp
+        source/platform/openGLRender/gl_shader_program.h
+        source/platform/openGLRender/gl_vertex_array.cpp
+        source/platform/openGLRender/gl_vertex_array.h
+        source/platform/openGLRender/gl_vertex_buffer_layout.cpp
+        source/platform/openGLRender/gl_vertex_buffer_layout.h
+        source/platform/openGLRender/gl_vertex_buffer.cpp
+        source/platform/openGLRender/gl_vertex_buffer.h
+        source/platform/openGLRender/gl_index_buffer.cpp
+        source/platform/openGLRender/gl_index_buffer.h
+        source/platform/openGLRender/gl_texture.cpp
+        source/platform/openGLRender/gl_texture.h
+        source/platform/openGLRender/gl_uniform_buffer.cpp
+        source/platform/openGLRender/gl_uniform_buffer.h
+        source/platform/openGLRender/gl_renderer.cpp
+        source/platform/openGLRender/gl_renderer.h
+        source/renderer/ortho_camera.cpp
+        source/renderer/ortho_camera.h
+        source/renderer/ICamera.h
+        source/renderer/perspective_camera.cpp
+        source/renderer/perspective_camera.h
+        source/renderer/CameraController.cpp
+        source/renderer/CameraController.h
+        source/scene/scene_node.cpp
+        source/scene/scene_node.h source/core/event.h
+        source/core/memory_and_binding.h
+        source/core/key_codes.h
+        source/core/app.cpp
+        source/core/app.h
+        source/core/geo_util.h
+        source/core/window.cpp
+        source/core/window.h
+        source/scene/SceneGrid.cpp
+        source/scene/SceneGrid.h
+#        scene/ViewCube.cpp
+#        scene/ViewCube.h
+        source/renderer/RenderCommand.cpp
+        source/renderer/RenderCommand.h
+        source/core/event_type.h
+        source/scene/Model.cpp
+        source/scene/Model.h source/renderer/Renderer.cpp source/renderer/Renderer.h)
 
 add_custom_command(TARGET ThreeDive
         POST_BUILD
@@ -63,7 +75,7 @@ add_custom_command(TARGET ThreeDive
         )
 
 target_compile_definitions(ThreeDive PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW)
-target_link_libraries(ThreeDive imgui::imgui glfw glad::glad spdlog::spdlog stb::stb glm::glm)
+target_link_libraries(ThreeDive imgui::imgui glfw glad::glad spdlog::spdlog stb::stb glm::glm freetype assimp::assimp)
 
 #add_subdirectory(tests)
 
