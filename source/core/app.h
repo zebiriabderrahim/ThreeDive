@@ -9,9 +9,8 @@
 #include <memory>
 #include <vector>
 
-#include "../renderer/ICamera.h"
-#include "../renderer/perspective_camera.h"
-#include "../renderer/CameraController.h"
+#include "../camera/perspective_camera.h"
+#include "../camera/camera_controller.h"
 #include "../platform/openGLRender/gl_shader_program.h"
 #include "../platform/openGLRender/gl_vertex_array.h"
 #include "../platform/openGLRender/gl_vertex_buffer.h"
@@ -31,9 +30,6 @@ namespace s3Dive {
         void run();
 
     private:
-        static constexpr unsigned int kScreenWidth = 800;
-        static constexpr unsigned int kScreenHeight = 600;
-
         SharedPtr<Window> window_;
         UniquePtr<CameraController> cameraController_;
         GLShaderProgram gridShader_;
@@ -44,15 +40,7 @@ namespace s3Dive {
 
         void onRender();
         void initializeCamera();
-        void initializeEventSystem();
         void initializeGrid();
-        void processEvents();
-
-        static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
-        static void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
-        static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
-        static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-        static void windowResizeCallback(GLFWwindow* window, int width, int height);
     };
 
 } // namespace s3Dive

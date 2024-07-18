@@ -8,12 +8,6 @@ namespace s3Dive {
 
     App::App(const std::shared_ptr<Window> &window) : window_(window) {
 
-        cameraController_ = std::make_unique<CameraController>(
-                std::make_unique<PerspectiveCamera>(45.0f, static_cast<float>(kScreenWidth)
-                                                           / static_cast<float>(kScreenHeight),
-                                                    0.1f, 100.0f),
-                CameraSettings{});
-
         window_->addEventListener(EventType::MouseMoved, [this](const EventVariant &event) {
             cameraController_->onEvent(event);
         });
@@ -26,9 +20,13 @@ namespace s3Dive {
         window_->addEventListener(EventType::MouseScrolled, [this](const EventVariant &event) {
             cameraController_->onEvent(event);
         });
+        window_->addEventListener(EventType::KeyPressed, [this](const EventVariant &event) {
+            cameraController_->onEvent(event);
+        });
         window_->addEventListener(EventType::WindowResize, [this](const EventVariant &event) {
             cameraController_->onEvent(event);
         });
+
 
     }
 
@@ -47,11 +45,9 @@ namespace s3Dive {
     }
 
     void App::run() {
-        float lastFrame = 0.0f;
+
         while (!glfwWindowShouldClose(window_.get()->getNativeWindow())) {
-            auto currentFrame = static_cast<float>(glfwGetTime());
-            float deltaTime = currentFrame - lastFrame;
-            lastFrame = currentFrame;
+
             window_->onUpdate();
             cameraController_->update();
             onRender();
@@ -60,8 +56,8 @@ namespace s3Dive {
     }
 
     void App::onRender() {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(0.266f, 0.26f, 0.25f, 1.0f);
+        RenderCommand::clear(GLRenderer::BufferBit::Depth, GLRenderer::BufferBit::Color);
+        RenderCommand::setClearColor(glm::vec4(0.266f, 0.26f, 0.25f, 1.0f));
 
         gridShader_.use();
 
@@ -84,16 +80,11 @@ namespace s3Dive {
     }
 
     void App::initializeCamera() {
-        auto camera = std::make_unique<PerspectiveCamera>(45.0f,
-                                                          static_cast<float>(kScreenWidth)
-                                                          / static_cast<float>(kScreenHeight),
-                                                          0.1f,
-                                                          100.0f);
         CameraSettings cameraSettings;
         cameraSettings.initialPosition = glm::vec3(40.0f, 40.0f, 40.0f);
         cameraSettings.targetPosition = glm::vec3(0.0f, 0.0f, 0.0f);
         cameraSettings.upVector = glm::vec3(0.0f, 0.0f, 1.0f);
-        cameraController_ = std::make_unique<CameraController>(std::move(camera));
+        cameraController_ = std::make_unique<CameraController>(cameraSettings);
     }
 
 

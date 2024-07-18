@@ -25,7 +25,7 @@ namespace s3Dive::Key
             D8                  = 56, /* 8 */
             D9                  = 57, /* 9 */
 
-            Semicolon           = 59, /* ; */
+            Semicolon           = 59, /* this ; */
             Equal               = 61, /* = */
 
             A                   = 65,
