@@ -39,13 +39,12 @@ add_executable(ThreeDive
         source/platform/openGLRender/gl_uniform_buffer.h
         source/platform/openGLRender/gl_renderer.cpp
         source/platform/openGLRender/gl_renderer.h
-        source/renderer/ortho_camera.cpp
-        source/renderer/ortho_camera.h
-        source/renderer/ICamera.h
-        source/renderer/perspective_camera.cpp
-        source/renderer/perspective_camera.h
-        source/renderer/CameraController.cpp
-        source/renderer/CameraController.h
+        source/camera/orthographic_camera.cpp
+        source/camera/orthographic_camera.h
+        source/camera/perspective_camera.cpp
+        source/camera/perspective_camera.h
+        source/camera/camera_controller.cpp
+        source/camera/camera_controller.h
         source/scene/scene_node.cpp
         source/scene/scene_node.h source/core/event.h
         source/core/memory_and_binding.h
@@ -59,11 +58,14 @@ add_executable(ThreeDive
         source/scene/SceneGrid.h
 #        scene/ViewCube.cpp
 #        scene/ViewCube.h
+#        source/scene/Model.cpp
+#        source/scene/Model.h
         source/renderer/RenderCommand.cpp
         source/renderer/RenderCommand.h
         source/core/event_type.h
-        source/scene/Model.cpp
-        source/scene/Model.h source/renderer/Renderer.cpp source/renderer/Renderer.h)
+        source/renderer/Renderer.cpp
+        source/renderer/Renderer.h
+        source/camera/camera.h)
 
 add_custom_command(TARGET ThreeDive
         POST_BUILD
