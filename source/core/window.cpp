@@ -97,6 +97,15 @@ namespace s3Dive {
             glViewport(0, 0, width, height);
         });
 
+        glfwSetKeyCallback(window_, [](GLFWwindow *window, int key, [[maybe_unused]] int scancode, int action, [[maybe_unused]] int mods) {
+            auto *win = static_cast<Window *>(glfwGetWindowUserPointer(window));
+            if (action == GLFW_PRESS) {
+                win->eventQueue_.enqueueEvent(KeyPressedEvent{static_cast<Key::KeyCode>(key)});
+            } else if (action == GLFW_RELEASE) {
+                win->eventQueue_.enqueueEvent(KeyReleasedEvent{static_cast<Key::KeyCode>(key)});
+            }
+        });
+
         glfwSetWindowCloseCallback(window_, [](GLFWwindow* window) {
             auto* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
             win->eventQueue_.enqueueEvent(WindowCloseEvent{});
