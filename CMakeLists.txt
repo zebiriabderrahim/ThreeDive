@@ -46,9 +46,9 @@ add_executable(ThreeDive
         source/camera/camera_controller.cpp
         source/camera/camera_controller.h
         source/scene/scene_node.cpp
-        source/scene/scene_node.h source/core/event.h
+        source/scene/scene_node.h source/events/event.h
         source/core/memory_and_binding.h
-        source/core/key_codes.h
+        source/events/key_codes.h
         source/core/app.cpp
         source/core/app.h
         source/core/geo_util.h
@@ -62,10 +62,10 @@ add_executable(ThreeDive
 #        source/scene/Model.h
         source/renderer/RenderCommand.cpp
         source/renderer/RenderCommand.h
-        source/core/event_type.h
+        source/events/event_type.h
         source/renderer/Renderer.cpp
         source/renderer/Renderer.h
-        source/camera/camera.h)
+)
 
 add_custom_command(TARGET ThreeDive
         POST_BUILD
