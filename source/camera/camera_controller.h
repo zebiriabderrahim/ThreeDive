@@ -1,7 +1,7 @@
 #include <variant>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "../core/event.h"
+#include "../events/event.h"
 #include "camera.h"
 #include "perspective_camera.h"
 #include "orthographic_camera.h"
