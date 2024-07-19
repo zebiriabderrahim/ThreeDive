@@ -14,8 +14,9 @@ namespace s3Dive {
         float farPlane = 1000.0f;
         float minDistance = 1.0f;
         float maxDistance = 100.0f;
-        float orbitSpeed = 0.005f;
+        float orbitSpeed = 0.007f;
         float zoomSpeed = 0.1f;
+        float panSpeed = 0.1f;
         glm::vec3 initialPosition = glm::vec3(40.0f, 40.0f, 40.0f);
         glm::vec3 targetPosition = glm::vec3(0.0f, 0.0f, 0.0f);
         glm::vec3 upVector = glm::vec3(0.0f, 0.0f, 1.0f);
@@ -45,10 +46,11 @@ namespace s3Dive {
         CameraSettings settings_;
 
         glm::vec3 position_{};
+        glm::vec2 lastMousePos_{};
         float distance_{};
 
-        glm::vec2 lastMousePos_{};
         bool isOrbiting_ = false;
+        bool isPanning_ = false;
         float aspectRatio_ = 1.0f;
 
         float detailVisibility1_ = 1.0f;
@@ -60,6 +62,8 @@ namespace s3Dive {
 
         void handleMouseOrbit(const glm::vec2& mouseDelta);
         void handleMouseZoom(float zoomDelta);
+        void handleMousePan(const glm::vec2 &panDelta);
+
         void updateCameraMatrices();
         void initializeView();
 

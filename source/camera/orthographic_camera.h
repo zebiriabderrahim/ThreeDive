@@ -16,19 +16,13 @@ namespace s3Dive {
         OrthographicCamera(float left, float right, float bottom, float top);
         ~OrthographicCamera() override = default;
 
-        void setPosition(const glm::vec3 &position) override { position_ = position; updateViewMatrix();}
         void setViewMatrix(const glm::mat4 &viewMatrix) override { viewMatrix_ = viewMatrix; }
         void setProjectionMatrix(const glm::mat4 &projectionMatrix) override { projectionMatrix_ = projectionMatrix; }
 
         [[nodiscard]] const glm::mat4 &getViewMatrix() const override { return viewMatrix_; }
         [[nodiscard]] const glm::mat4 &getProjectionMatrix() const override { return projectionMatrix_; }
-        [[nodiscard]] const glm::vec3 &getPosition() const override { return position_; }
-        [[nodiscard]] const glm::vec3 &getTarget() const override { return target_; };
-        [[nodiscard]] const glm::vec3 &getUp() const override { return up_; };
 
-        void updateViewMatrix() override;
         void updateProjectionMatrix() override;
-
 
         static constexpr float DEFAULT_NEAR_PLANE = 0.1f;
         static constexpr float DEFAULT_FAR_PLANE = 100.0f;
@@ -36,9 +30,7 @@ namespace s3Dive {
     private:
         glm::mat4 viewMatrix_{1.0f};
         glm::mat4 projectionMatrix_{1.0f};
-        glm::vec3 position_{0.0f};
-        glm::vec3 target_{0.0f, 0.0f, -1.0f};
-        glm::vec3 up_{0.0f, 1.0f, 0.0f};
+
 
         float left_;
         float right_;

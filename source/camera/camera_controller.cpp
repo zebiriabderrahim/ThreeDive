@@ -53,18 +53,25 @@ namespace s3Dive {
 
     void CameraController::handleMouseMoved(const MouseMovedEvent& e)
     {
+        glm::vec2 currentPos(e.x, e.y);
+        glm::vec2 delta = currentPos - lastMousePos_;
+
         if (isOrbiting_) {
-            glm::vec2 currentPos(e.x, e.y);
-            glm::vec2 delta = currentPos - lastMousePos_;
             handleMouseOrbit(delta);
-            lastMousePos_ = currentPos;
+        } else if (isPanning_) {
+            handleMousePan(delta);
         }
+
+        lastMousePos_ = currentPos;
     }
 
     void CameraController::handleMouseButtonPressed(const MouseButtonPressedEvent& e)
     {
         if (e.button == MouseCode::ButtonLeft) {
             isOrbiting_ = true;
+            lastMousePos_ = glm::vec2(e.x, e.y);
+        } else if (e.button == MouseCode::ButtonRight) {
+            isPanning_ = true;
             lastMousePos_ = glm::vec2(e.x, e.y);
         }
     }
@@ -73,6 +80,8 @@ namespace s3Dive {
     {
         if (e.button == MouseCode::ButtonLeft) {
             isOrbiting_ = false;
+        } else if (e.button == MouseCode::ButtonRight) {
+            isPanning_ = false;
         }
     }
 
@@ -91,31 +100,18 @@ namespace s3Dive {
         if (e.keyCode == Key::KeyCode::P && !std::holds_alternative<PerspectiveCamera>(cameraVariant_)) {
             spdlog::info("Switching to perspective camera");
             cameraVariant_.emplace<PerspectiveCamera>(45.0f, aspectRatio_, settings_.nearPlane, settings_.farPlane);
-            updateCameraMatrices();
         } else if (e.keyCode == Key::KeyCode::O && !std::holds_alternative<OrthographicCamera>(cameraVariant_)) {
             spdlog::info("Switching to orthographic camera");
             float orthoSize = distance_ * 0.5f;
             float orthoWidth = orthoSize * aspectRatio_;
             float orthoHeight = orthoSize;
             cameraVariant_.emplace<OrthographicCamera>(-orthoWidth, orthoWidth, -orthoHeight, orthoHeight);
-            updateCameraMatrices();
         }
     }
 
     void CameraController::setViewportSize(unsigned int width, unsigned int height)
     {
         aspectRatio_ = static_cast<float>(width) / static_cast<float>(height);
-
-        auto updateProjectionVisitor = [this](auto& camera) {
-            if constexpr (std::is_same_v<std::decay_t<decltype(camera)>, PerspectiveCamera>) {
-                camera.setAspectRatio(aspectRatio_);
-            } else if constexpr (std::is_same_v<std::decay_t<decltype(camera)>, OrthographicCamera>) {
-                updateOrthographicProjection(camera);
-            }
-        };
-
-        std::visit(updateProjectionVisitor, cameraVariant_);
-        updateCameraMatrices();
     }
 
     void CameraController::handleMouseOrbit(const glm::vec2& mouseDelta)
@@ -141,15 +137,6 @@ namespace s3Dive {
 
         glm::vec3 direction = glm::normalize(settings_.targetPosition - position_);
         position_ = settings_.targetPosition - direction * distance_;
-
-        auto updateProjectionVisitor = [this](auto& camera) {
-            if constexpr (std::is_same_v<std::decay_t<decltype(camera)>, OrthographicCamera>) {
-                updateOrthographicProjection(camera);
-            }
-        };
-        std::visit(updateProjectionVisitor, cameraVariant_);
-
-        updateCameraMatrices();
     }
 
     void CameraController::updateCameraMatrices()
@@ -188,6 +175,23 @@ namespace s3Dive {
         float orthoHeight = orthoSize;
         glm::mat4 projectionMatrix = glm::ortho(-orthoWidth, orthoWidth, -orthoHeight, orthoHeight, settings_.nearPlane, settings_.farPlane);
         camera.setProjectionMatrix(projectionMatrix);
+    }
+
+    void CameraController::handleMousePan(const glm::vec2 &panDelta) {
+        // Calculate right vector
+        glm::vec3 forward = glm::normalize(settings_.targetPosition - position_);
+        glm::vec3 right = glm::normalize(glm::cross(forward, settings_.upVector));
+
+        // Calculate up vector
+        glm::vec3 up = glm::cross(right, forward);
+
+        // Scale the pan speed based on distance from target
+        float panSpeed = distance_ * settings_.panSpeed;
+
+        // Move both the camera position and target
+        glm::vec3 panOffset = -right * panDelta.x * panSpeed + up * panDelta.y * panSpeed;
+        position_ += panOffset;
+        settings_.targetPosition += panOffset;
     }
 
 } // namespace s3Dive
