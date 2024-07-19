@@ -32,12 +32,8 @@ namespace s3Dive {
         [[nodiscard]] const glm::vec3 &getTarget() const override { return target_; };
         [[nodiscard]] const glm::vec3 &getUp() const override { return up_; };
 
-
-
         void updateViewMatrix() override;
         void updateProjectionMatrix() override;
-
-
 
     private:
         glm::mat4 viewMatrix_{1.0f};

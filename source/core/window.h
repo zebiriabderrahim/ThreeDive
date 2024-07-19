@@ -10,7 +10,7 @@
 #include <utility>
 #include <GLFW/glfw3.h>
 #include "memory_and_binding.h"
-#include "event.h"
+#include "../events/event.h"
 
 namespace s3Dive {
 

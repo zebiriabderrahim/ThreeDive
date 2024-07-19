@@ -9,7 +9,7 @@
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
-#include "key_codes.h"
+#include "../events/key_codes.h"
 
 
 namespace s3Dive {
