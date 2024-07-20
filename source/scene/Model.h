@@ -1,7 +1,6 @@
 //
 // Created by ABDERRAHIM ZEBIRI on 2024-07-14.
 //
-#pragma once
 
 #ifndef THREEDIVE_MODEL_H
 #define THREEDIVE_MODEL_H

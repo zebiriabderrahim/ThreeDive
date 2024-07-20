@@ -1,7 +1,6 @@
 //
 // Created by ABDERRAHIM ZEBIRI on 2024-06-29.
 //
-#pragma once
 
 #ifndef THREEDIVE_GL_RENDERER_H
 #define THREEDIVE_GL_RENDERER_H

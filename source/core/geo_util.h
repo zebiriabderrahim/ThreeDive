@@ -4,7 +4,6 @@
 
 #ifndef THREEDIVE_GEO_UTIL_H
 #define THREEDIVE_GEO_UTIL_H
-#pragma once
 
 #include <vector>
 #include <glm/glm.hpp>
@@ -14,7 +13,8 @@ namespace s3Dive {
         int lineCount = static_cast<int>((2 * size) / step) + 1;
 
         auto addLine = [&](const glm::vec3 &start, const glm::vec3 &end, float visibility, const glm::vec3 &color) {
-            float alpha = visibility >= 0.9f ? 1.0f : (visibility >= 0.4f ? 0.5f : 0.25f);
+            float visibilityValue = visibility >= 0.4f ? 0.5f : 0.25f;
+            float alpha = visibility >= 0.9f ? 1.0f : visibilityValue;
             glm::vec3 direction = glm::normalize(end - start);
             glm::vec3 extension = direction * (visibility >= 0.9f ? extensionSize : extensionSize * 0.5f);
 

@@ -1,7 +1,6 @@
 //
 // Created by ABDERRAHIM ZEBIRI on 2024-07-07.
 //
-#pragma once
 
 #ifndef THREEDIVE_INPUTMANAGER_H
 #define THREEDIVE_INPUTMANAGER_H

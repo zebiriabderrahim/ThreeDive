@@ -1,7 +1,6 @@
 //
 // Created by ABDERRAHIM ZEBIRI on 2024-06-26.
 //
-#pragma once
 
 #ifndef THREEDIVE_GL_TEXTURE_H
 #define THREEDIVE_GL_TEXTURE_H

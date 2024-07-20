@@ -1,3 +1,11 @@
+//
+// Created by ABDERRAHIM ZEBIRI on 2024-07-17.
+//
+
+
+#ifndef CAMERA_CONTROLLER_H
+#define CAMERA_CONTROLLER_H
+
 #include <variant>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -79,3 +87,5 @@ namespace s3Dive {
     };
 
 } // namespace s3Dive
+
+#endif //CAMERA_CONTROLLER_H

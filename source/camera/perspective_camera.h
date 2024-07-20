@@ -1,7 +1,6 @@
 //
 // Created by ABDERRAHIM ZEBIRI on 2024-07-01.
 //
-#pragma once
 
 #ifndef THREEDIVE_PERSPECTIVE_CAMERA_H
 #define THREEDIVE_PERSPECTIVE_CAMERA_H

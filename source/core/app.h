@@ -1,7 +1,6 @@
 //
 // Created by ABDERRAHIM ZEBIRI on 2024-07-06.
 //
-#pragma once
 
 #ifndef THREEDIVE_APP_H
 #define THREEDIVE_APP_H

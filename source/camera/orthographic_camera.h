@@ -1,7 +1,6 @@
 //
 // Created by ABDERRAHIM ZEBIRI on 2024-06-30.
 //
-#pragma once
 
 #ifndef THREEDIVE_ORTHOGRAPHIC_CAMERA_H
 #define THREEDIVE_ORTHOGRAPHIC_CAMERA_H

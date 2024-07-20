@@ -1,6 +1,7 @@
 //
 // Created by ABDERRAHIM ZEBIRI on 2024-07-09.
 //
+
 #ifndef THREEDIVE_SCENEGRID_H
 #define THREEDIVE_SCENEGRID_H
 
@@ -33,7 +34,7 @@ namespace s3Dive {
         int getFadeSteps() const { return fadeSteps_; }
 
     private:
-        std::vector<float> generateGridVertices() const;
+        [[nodiscard]] std::vector<float> generateGridVertices() const;
         void initializeOpenGLObjects();
 
         std::shared_ptr<GLVertexBuffer> VBO_;
