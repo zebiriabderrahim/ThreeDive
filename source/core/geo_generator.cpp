@@ -1,13 +1,13 @@
 //
-// Created by ABDERRAHIM ZEBIRI on 2024-07-07.
+// Created by ABDERRAHIM ZEBIRI on 2024-07-21.
 //
 
-#ifndef THREEDIVE_GEO_UTIL_H
-#define THREEDIVE_GEO_UTIL_H
+#include "geo_generator.h"
 
-#include <vector>
 #include <glm/glm.hpp>
-namespace s3Dive {
+
+
+namespace geo {
     std::vector<float> generateDetailedGridVertices(float size, float step, float extensionSize, int fadeSteps) {
         std::vector<float> vertices;
         int lineCount = static_cast<int>((2 * size) / step) + 1;
@@ -55,8 +55,8 @@ namespace s3Dive {
 //                // Y-axis (green)
 //                addLine({0, -size, 0}, {0, size, 0}, 1.0f, glm::vec3(0.3f,0.65f,0.2f));
 //            } else {
-                addLine({pos, -size, 0}, {pos, size, 0}, 1.0f, color);
-                addLine({-size, pos, 0}, {size, pos, 0}, 1.0f, color);
+            addLine({pos, -size, 0}, {pos, size, 0}, 1.0f, color);
+            addLine({-size, pos, 0}, {size, pos, 0}, 1.0f, color);
 //            }
 
             if (i < lineCount - 1) {
@@ -78,5 +78,4 @@ namespace s3Dive {
         return vertices;
     }
 
-} // s3Dive
-#endif //THREEDIVE_GEO_UTIL_H
+} // geo
