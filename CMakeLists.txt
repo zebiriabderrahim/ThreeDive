@@ -10,6 +10,7 @@ find_package(stb REQUIRED)
 find_package(glm REQUIRED)
 find_package(freetype REQUIRED)
 find_package(assimp REQUIRED)
+find_package(EnTT REQUIRED)
 
 add_executable(ThreeDive
         source/main.cpp
@@ -45,26 +46,27 @@ add_executable(ThreeDive
         source/camera/perspective_camera.h
         source/camera/camera_controller.cpp
         source/camera/camera_controller.h
-        source/scene/scene_node.cpp
-        source/scene/scene_node.h source/events/event.h
+        source/events/event.h
         source/core/memory_and_binding.h
         source/events/key_codes.h
         source/core/app.cpp
         source/core/app.h
-        source/core/geo_util.h
         source/core/window.cpp
         source/core/window.h
-        source/scene/SceneGrid.cpp
-        source/scene/SceneGrid.h
-#        scene/ViewCube.cpp
-#        scene/ViewCube.h
-#        source/scene/Model.cpp
-#        source/scene/Model.h
         source/renderer/RenderCommand.cpp
         source/renderer/RenderCommand.h
         source/events/event_type.h
         source/renderer/Renderer.cpp
         source/renderer/Renderer.h
+        source/scene/scene.cpp
+        source/scene/scene.h
+        source/core/uuid.cpp
+        source/core/uuid.h
+        source/scene/components.h
+        source/scene/SceneGridSystem.cpp
+        source/scene/SceneGridSystem.h
+        source/core/geo_generator.cpp
+        source/core/geo_generator.h
 )
 
 add_custom_command(TARGET ThreeDive
@@ -76,8 +78,8 @@ add_custom_command(TARGET ThreeDive
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/assets/wall.jpg $<TARGET_FILE_DIR:ThreeDive>
         )
 
-target_compile_definitions(ThreeDive PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW)
-target_link_libraries(ThreeDive imgui::imgui glfw glad::glad spdlog::spdlog stb::stb glm::glm freetype assimp::assimp)
+target_compile_definitions(ThreeDive PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW ENTT_INCLUDE_NATVIS)
+target_link_libraries(ThreeDive imgui::imgui glfw glad::glad spdlog::spdlog stb::stb glm::glm freetype assimp::assimp EnTT::EnTT)
 
 #add_subdirectory(tests)
 
