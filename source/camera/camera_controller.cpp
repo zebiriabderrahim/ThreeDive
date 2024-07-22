@@ -29,10 +29,6 @@ namespace s3Dive {
 
     void CameraController::update()
     {
-        float distanceToTarget = glm::distance(position_, settings_.targetPosition);
-        detailVisibility1_ = 1.0f - glm::clamp((distanceToTarget - kDetailVisibilityNear1) / (kDetailVisibilityFar1 - kDetailVisibilityNear1), 0.0f, 1.0f);
-        detailVisibility2_ = 1.0f - glm::clamp((distanceToTarget - kDetailVisibilityNear2) / (kDetailVisibilityFar2 - kDetailVisibilityNear2), 0.0f, 1.0f);
-
         updateCameraMatrices();
     }
 
@@ -192,6 +188,10 @@ namespace s3Dive {
         glm::vec3 panOffset = -right * panDelta.x * panSpeed + up * panDelta.y * panSpeed;
         position_ += panOffset;
         settings_.targetPosition += panOffset;
+    }
+
+    float CameraController::getDistanceToTarget() const {
+        return glm::distance(position_, settings_.targetPosition);
     }
 
 } // namespace s3Dive

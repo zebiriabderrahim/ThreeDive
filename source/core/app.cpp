@@ -1,8 +1,7 @@
 #include "app.h"
-#include "InputManager.h"
 #include <glm/gtc/type_ptr.hpp>
-#include "geo_util.h"
 #include "../renderer/RenderCommand.h"
+#include "geo_generator.h"
 
 namespace s3Dive {
 
@@ -72,8 +71,8 @@ namespace s3Dive {
         glm::mat4 view = camera.getViewMatrix();
         gridShader_.updateShaderUniform("view", glm::value_ptr(view));
 
-        gridShader_.updateShaderUniform("detailVisibility1", cameraController_->getDetailVisibility1());
-        gridShader_.updateShaderUniform("detailVisibility2", cameraController_->getDetailVisibility2());
+        gridShader_.updateShaderUniform("detailVisibility1", cameraController_->getDistanceToTarget());
+        gridShader_.updateShaderUniform("detailVisibility2", cameraController_->getDistanceToTarget() - 1.0f);
 
 
         RenderCommand::drawLines(vao_, static_cast<GLint>(gridVertices_.size() / 8));
@@ -93,7 +92,7 @@ namespace s3Dive {
         constexpr float gridStep = 2.0f;
         constexpr float extensionSize = 4.0f;
         constexpr int fadeSteps = 5;
-        gridVertices_ = s3Dive::generateDetailedGridVertices(gridSize, gridStep, extensionSize, fadeSteps);
+        gridVertices_ = geo::generateDetailedGridVertices(gridSize, gridStep, extensionSize, fadeSteps);
 
         vao_.bind();
         vbo_ = std::make_shared<GLVertexBuffer>(gridVertices_);

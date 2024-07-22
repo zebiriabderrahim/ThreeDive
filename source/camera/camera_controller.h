@@ -39,10 +39,9 @@ namespace s3Dive {
 
         void setViewportSize(unsigned int width, unsigned int height);
 
+        [[nodiscard]] float getDistanceToTarget() const;
         [[nodiscard]] const Camera& getCamera() const;
         [[nodiscard]] Camera& getCamera();
-        [[nodiscard]] float getDetailVisibility1() const { return detailVisibility1_; }
-        [[nodiscard]] float getDetailVisibility2() const { return detailVisibility2_; }
 
         template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
         template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
@@ -60,13 +59,6 @@ namespace s3Dive {
         bool isOrbiting_ = false;
         bool isPanning_ = false;
         float aspectRatio_ = 1.0f;
-
-        float detailVisibility1_ = 1.0f;
-        float detailVisibility2_ = 1.0f;
-        static constexpr float kDetailVisibilityNear1 = 20.0f;
-        static constexpr float kDetailVisibilityFar1 = 40.0f;
-        static constexpr float kDetailVisibilityNear2 = 10.0f;
-        static constexpr float kDetailVisibilityFar2 = 20.0f;
 
         void handleMouseOrbit(const glm::vec2& mouseDelta);
         void handleMouseZoom(float zoomDelta);
