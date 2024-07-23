@@ -11,7 +11,7 @@ namespace s3Dive {
     Scene::Scene() : gridSystem_(std::make_unique<SceneGridSystem>()) {}
 
     entt::entity Scene::createEntity() {
-        UUID uuid = UUID::generate();
+        UUID uuid {};
         entt::entity entity = registry_.create();
         addEntity(uuid, entity);
         return entity;
@@ -26,15 +26,10 @@ namespace s3Dive {
     }
 
     entt::entity Scene::getEntity(const UUID& uuid) const {
-        auto it = entitiesMap_.find(uuid);
-        if (it != entitiesMap_.end()) {
+        if (auto it = entitiesMap_.find(uuid); it != entitiesMap_.end()) {
             return it->second;
         }
-        throw std::runtime_error("Entity not found");
-    }
-
-    void Scene::forEach(const std::function<void(entt::entity)>& func) {
-        registry_.each(func);
+        return entt::null;
     }
 
     void Scene::clear() {
@@ -49,6 +44,15 @@ namespace s3Dive {
     void Scene::onUpdate(float deltaTime) {
         // Implement your update logic here
         // You can iterate over systems or specific components
+    }
+
+    std::optional<UUID> Scene::getEntityUUID(entt::entity entity) const {
+        for (const auto& [uuid, e] : entitiesMap_) {
+            if (e == entity) {
+                return uuid;
+            }
+        }
+        return std::nullopt;
     }
 
 } // namespace s3Dive

@@ -1,14 +1,9 @@
-//
-// Created by ABDERRAHIM ZEBIRI on 2024-07-20.
-//
 #ifndef THREEDIVE_SCENE_H
 #define THREEDIVE_SCENE_H
 
 #include <unordered_map>
-#include <string>
-#include <memory>
 #include <functional>
-#include <entt/entt.hpp>
+#include <entt/entity/registry.hpp>
 #include "../core/uuid.h"
 
 namespace s3Dive {
@@ -28,11 +23,13 @@ namespace s3Dive {
         void onUpdate(float deltaTime);
 
         entt::registry& getRegistry() { return registry_; }
+        const entt::registry& getRegistry() const { return registry_; }
         const EntityMap& getEntities() const { return entitiesMap_; }
 
         entt::entity createEntity();
         void destroyEntity(const UUID& uuid);
         entt::entity getEntity(const UUID& uuid) const;
+        std::optional<UUID> getEntityUUID(entt::entity entity) const;
 
         template<typename T, typename... Args>
         T& addComponent(const UUID& uuid, Args&&... args) {
@@ -53,12 +50,26 @@ namespace s3Dive {
         }
 
         template<typename T>
+        const T& getComponent(const UUID& uuid) const {
+            auto entity = getEntity(uuid);
+            return registry_.get<T>(entity);
+        }
+
+        template<typename T>
         bool hasComponent(const UUID& uuid) const {
             auto entity = getEntity(uuid);
             return registry_.all_of<T>(entity);
         }
 
-        void forEach(const std::function<void(entt::entity)>& func);
+        template<typename... Components>
+        auto view() {
+            return registry_.view<Components...>();
+        }
+
+        template<typename... Components>
+        auto view() const {
+            return registry_.view<Components...>();
+        }
 
         void clear();
 
