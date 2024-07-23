@@ -67,6 +67,8 @@ add_executable(ThreeDive
         source/scene/SceneGridSystem.h
         source/core/geo_generator.cpp
         source/core/geo_generator.h
+        source/scene/entity.cpp
+        source/scene/entity.h
 )
 
 add_custom_command(TARGET ThreeDive
