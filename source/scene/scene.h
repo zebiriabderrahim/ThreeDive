@@ -5,6 +5,9 @@
 #include <functional>
 #include <entt/entity/registry.hpp>
 #include "../core/uuid.h"
+#include "../camera/camera_controller.h"
+#include "../platform/openGLRender/gl_shader_program.h"
+#include "SceneGridSystem.h"
 
 namespace s3Dive {
 
@@ -12,7 +15,7 @@ namespace s3Dive {
     public:
         using EntityMap = std::unordered_map<UUID, entt::entity>;
 
-        Scene() = default;
+        Scene();
         ~Scene() = default;
 
         Scene(const Scene&) = delete;
@@ -20,7 +23,7 @@ namespace s3Dive {
         Scene(Scene&&) noexcept = default;
         Scene& operator=(Scene&&) noexcept = default;
 
-        void onUpdate(float deltaTime);
+        void RenderScene(GLShaderProgram& shaderProgram, const CameraController &cameraController);
 
         entt::registry& getRegistry() { return registry_; }
         const entt::registry& getRegistry() const { return registry_; }
@@ -77,8 +80,8 @@ namespace s3Dive {
         entt::registry registry_;
         EntityMap entitiesMap_;
 
-        UUID gridUUID_; // Store the UUID of the grid entity
-        std::unique_ptr<SceneGridSystem> gridSystem_; // Unique pointer to the SceneGridSystem
+        UUID gridUUID_{}; // Store the UUID of the grid entity
+        SceneGridSystem gridSystem_; // Unique pointer to the SceneGridSystem
 
         void addEntity(const UUID& uuid, entt::entity entity);
     };

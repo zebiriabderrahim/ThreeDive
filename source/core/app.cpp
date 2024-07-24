@@ -71,11 +71,7 @@ namespace s3Dive {
         glm::mat4 view = camera.getViewMatrix();
         gridShader_.updateShaderUniform("view", glm::value_ptr(view));
 
-        gridShader_.updateShaderUniform("detailVisibility1", cameraController_->getDistanceToTarget());
-        gridShader_.updateShaderUniform("detailVisibility2", cameraController_->getDistanceToTarget() - 1.0f);
-
-
-        RenderCommand::drawLines(vao_, static_cast<GLint>(gridVertices_.size() / 8));
+        scene_.RenderScene(gridShader_, *cameraController_);
     }
 
     void App::initializeCamera() {

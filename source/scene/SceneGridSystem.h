@@ -18,12 +18,12 @@ namespace s3Dive {
 
     class SceneGridSystem {
     public:
-        SceneGridSystem(SceneGridComponent &grid, GLShaderProgram& shaderProgram);
-        void render(SceneGridComponent &grid, const CameraController &cameraController);
+        SceneGridSystem() = default;
+        ~SceneGridSystem() = default;
+        void render(SceneGridComponent &grid, GLShaderProgram& shaderProgram, const CameraController &cameraController);
 
     private:
         GLVertexArray vao_{};
-        GLShaderProgram& shaderProgram_;
 
         static constexpr float kDetailVisibilityNear1 = 20.0f;
         static constexpr float kDetailVisibilityFar1 = 40.0f;

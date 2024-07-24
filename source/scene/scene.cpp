@@ -2,13 +2,14 @@
 // Created by ABDERRAHIM ZEBIRI on 2024-07-20.
 //
 
-#include <memory>
 #include "SceneGridSystem.h"
 
-#include "Scene.h"
+#include "scene.h"
 
 namespace s3Dive {
-    Scene::Scene() : gridSystem_(std::make_unique<SceneGridSystem>()) {}
+    Scene::Scene() {
+        addEntity(gridUUID_, createEntity());
+    }
 
     entt::entity Scene::createEntity() {
         UUID uuid {};
@@ -41,9 +42,15 @@ namespace s3Dive {
         entitiesMap_[uuid] = entity;
     }
 
-    void Scene::onUpdate(float deltaTime) {
+    void Scene::RenderScene( GLShaderProgram& shaderProgram, const CameraController &cameraController) {
         // Implement your update logic here
         // You can iterate over systems or specific components
+        auto view = registry_.view<SceneGridComponent>();
+        auto gridComponent = view.get<SceneGridComponent>(view.front());
+        gridSystem_.render(gridComponent, shaderProgram, cameraController);
+
+
+
     }
 
     std::optional<UUID> Scene::getEntityUUID(entt::entity entity) const {

@@ -7,11 +7,6 @@
 
 
 namespace s3Dive {
-    SceneGridSystem::SceneGridSystem(SceneGridComponent &grid, GLShaderProgram& shaderProgram)
-            : shaderProgram_(shaderProgram) {
-        initialize(grid);
-    }
-
     void SceneGridSystem::initialize(SceneGridComponent &grid) {
         auto vbo = std::make_shared<GLVertexBuffer>(grid.vertices);
         GLVertexBufferLayout layout{};
@@ -39,7 +34,7 @@ namespace s3Dive {
         cachedDistanceToTarget_ = distanceToTarget;
     }
 
-    void SceneGridSystem::render(SceneGridComponent &grid, const CameraController &cameraController) {
+    void SceneGridSystem::render(SceneGridComponent &grid, GLShaderProgram& shaderProgram, const CameraController &cameraController) {
         if (!grid.isInitialized) {
             initialize(grid);
         }
@@ -50,12 +45,12 @@ namespace s3Dive {
             calculateVisibility(currentDistanceToTarget);
         }
 
-        shaderProgram_.use();
-        shaderProgram_.updateShaderUniform("detailVisibility1", cachedDetailVisibility1_);
-        shaderProgram_.updateShaderUniform("detailVisibility2", cachedDetailVisibility2_);
+        shaderProgram.use();
+        shaderProgram.updateShaderUniform("detailVisibility1", cachedDetailVisibility1_);
+        shaderProgram.updateShaderUniform("detailVisibility2", cachedDetailVisibility2_);
 
         RenderCommand::drawLines(vao_, static_cast<GLint>(grid.vertices.size() / 8));
 
-        shaderProgram_.unuse();
+        shaderProgram.unuse();
     }
 } // s3Dive

@@ -14,6 +14,7 @@
 #include "../platform/openGLRender/gl_vertex_array.h"
 #include "../platform/openGLRender/gl_vertex_buffer.h"
 #include "window.h"
+#include "../scene/scene.h"
 
 namespace s3Dive {
 
@@ -36,6 +37,8 @@ namespace s3Dive {
         std::shared_ptr<GLVertexBuffer> vbo_;
 
         std::vector<float> gridVertices_;
+
+        Scene scene_{};
 
         void onRender();
         void initializeCamera();
