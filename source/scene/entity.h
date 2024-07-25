@@ -21,7 +21,7 @@ namespace s3Dive {
         template<typename T>T& getComponent();
         template<typename T> const T& getComponent() const;
         template<typename T> [[nodiscard]] bool hasComponent() const;
-        std::optional<UUID> getUUID() const;
+        [[nodiscard]] std::optional<UUID> getUUID() const;
 
         explicit operator bool() const { return entityHandle != entt::null && scene != nullptr; }
         explicit operator entt::entity() const { return entityHandle; }

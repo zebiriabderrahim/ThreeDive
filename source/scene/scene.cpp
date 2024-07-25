@@ -2,17 +2,17 @@
 // Created by ABDERRAHIM ZEBIRI on 2024-07-20.
 //
 
-#include "SceneGridSystem.h"
+#include "sceneGridSystem.h"
 
 #include "scene.h"
+#include "entity.h"
+#include "components.h"
 
 namespace s3Dive {
-    Scene::Scene() {
-        addEntity(gridUUID_, createEntity());
-    }
+
 
     entt::entity Scene::createEntity() {
-        UUID uuid {};
+        UUID uuid{};
         entt::entity entity = registry_.create();
         addEntity(uuid, entity);
         return entity;
@@ -26,31 +26,11 @@ namespace s3Dive {
         }
     }
 
-    entt::entity Scene::getEntity(const UUID& uuid) const {
+    std::optional<entt::entity> Scene::getEntity(const UUID& uuid) const {
         if (auto it = entitiesMap_.find(uuid); it != entitiesMap_.end()) {
             return it->second;
         }
-        return entt::null;
-    }
-
-    void Scene::clear() {
-        registry_.clear();
-        entitiesMap_.clear();
-    }
-
-    void Scene::addEntity(const UUID& uuid, entt::entity entity) {
-        entitiesMap_[uuid] = entity;
-    }
-
-    void Scene::RenderScene( GLShaderProgram& shaderProgram, const CameraController &cameraController) {
-        // Implement your update logic here
-        // You can iterate over systems or specific components
-        auto view = registry_.view<SceneGridComponent>();
-        auto gridComponent = view.get<SceneGridComponent>(view.front());
-        gridSystem_.render(gridComponent, shaderProgram, cameraController);
-
-
-
+        return std::nullopt;
     }
 
     std::optional<UUID> Scene::getEntityUUID(entt::entity entity) const {
@@ -60,6 +40,15 @@ namespace s3Dive {
             }
         }
         return std::nullopt;
+    }
+
+    void Scene::clear() {
+        registry_.clear();
+        entitiesMap_.clear();
+    }
+
+    void Scene::addEntity(const UUID& uuid, entt::entity entity) {
+        entitiesMap_[uuid] = entity;
     }
 
 } // namespace s3Dive
