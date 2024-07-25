@@ -2,31 +2,29 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "../renderer/RenderCommand.h"
 #include "geo_generator.h"
+#include "window.h"
 
 namespace s3Dive {
 
-    App::App(const std::shared_ptr<Window> &window) : window_(window) {
-
-        window_->addEventListener(EventType::MouseMoved, [this](const EventVariant &event) {
+    App::App(const std::shared_ptr<Window>& window) : window_(window) {
+        window_->addEventListener(EventType::MouseMoved, [this](const EventVariant& event) {
             cameraController_->onEvent(event);
         });
-        window_->addEventListener(EventType::MouseButtonPressed, [this](const EventVariant &event) {
+        window_->addEventListener(EventType::MouseButtonPressed, [this](const EventVariant& event) {
             cameraController_->onEvent(event);
         });
-        window_->addEventListener(EventType::MouseButtonReleased, [this](const EventVariant &event) {
+        window_->addEventListener(EventType::MouseButtonReleased, [this](const EventVariant& event) {
             cameraController_->onEvent(event);
         });
-        window_->addEventListener(EventType::MouseScrolled, [this](const EventVariant &event) {
+        window_->addEventListener(EventType::MouseScrolled, [this](const EventVariant& event) {
             cameraController_->onEvent(event);
         });
-        window_->addEventListener(EventType::KeyPressed, [this](const EventVariant &event) {
+        window_->addEventListener(EventType::KeyPressed, [this](const EventVariant& event) {
             cameraController_->onEvent(event);
         });
-        window_->addEventListener(EventType::WindowResize, [this](const EventVariant &event) {
+        window_->addEventListener(EventType::WindowResize, [this](const EventVariant& event) {
             cameraController_->onEvent(event);
         });
-
-
     }
 
     App::~App() = default;
@@ -35,6 +33,7 @@ namespace s3Dive {
         RenderCommand::init();
         initializeCamera();
         initializeGrid();
+        initializeSystems();
 
         glEnable(GL_DEPTH_TEST);
 
@@ -44,13 +43,17 @@ namespace s3Dive {
     }
 
     void App::run() {
-
-        while (!glfwWindowShouldClose(window_.get()->getNativeWindow())) {
-
+        while (!glfwWindowShouldClose(window_->getNativeWindow())) {
             window_->onUpdate();
             cameraController_->update();
-            onRender();
 
+//            // Update systems
+//            for (auto& system : systems_) {
+//                system->update(scene_, window_->getDeltaTime());
+//            }
+            systems_.update(scene_, 0);
+
+            onRender();
         }
     }
 
@@ -60,18 +63,22 @@ namespace s3Dive {
 
         gridShader_.use();
 
-
         glm::mat4 model(1.0f);
         gridShader_.updateShaderUniform("model", glm::value_ptr(model));
 
-        const auto &camera = cameraController_->getCamera();
+        const auto& camera = cameraController_->getCamera();
         glm::mat4 projection = camera.getProjectionMatrix();
         gridShader_.updateShaderUniform("projection", glm::value_ptr(projection));
 
         glm::mat4 view = camera.getViewMatrix();
         gridShader_.updateShaderUniform("view", glm::value_ptr(view));
 
-        scene_.RenderScene(gridShader_, *cameraController_);
+        // Render systems
+//        for (auto& system : systems_) {
+//            system->render(scene_, gridShader_, *cameraController_);
+//        }
+        systems_.render(scene_, gridShader_, *cameraController_);
+
     }
 
     void App::initializeCamera() {
@@ -82,25 +89,23 @@ namespace s3Dive {
         cameraController_ = std::make_unique<CameraController>(cameraSettings);
     }
 
-
     void App::initializeGrid() {
         constexpr float gridSize = 10.0f;
         constexpr float gridStep = 2.0f;
         constexpr float extensionSize = 4.0f;
         constexpr int fadeSteps = 5;
-        gridVertices_ = geo::generateDetailedGridVertices(gridSize, gridStep, extensionSize, fadeSteps);
 
-        vao_.bind();
-        vbo_ = std::make_shared<GLVertexBuffer>(gridVertices_);
-        GLVertexBufferLayout layout;
-        layout.addVertexElement<float>(3);
-        layout.addVertexElement<float>(4);
-        layout.addVertexElement<float>(1);
-        vbo_->setLayout(layout);
+        // Create grid entity in the scene
+        auto gridEntity = scene_.createEntity();
+        scene_.addComponent<SceneGridComponent>(scene_.getEntityUUID(gridEntity).value(),
+                                                gridSize, gridStep, extensionSize, fadeSteps);
 
-        vao_.addVertexBuffer(vbo_);
     }
 
 
-} // namespace s3Dive
+    void App::initializeSystems() {
+        //systems_.push_back(std::make_unique<SceneGridSystem>());
+        // Add other systems as needed
+    }
 
+} // namespace s3Dive
