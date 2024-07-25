@@ -1,26 +1,31 @@
-//
-// Created by ABDERRAHIM ZEBIRI on 2024-07-21.
-//
-
-#ifndef THREEDIVE_SCENEGRIDSYSTEM_H
-#define THREEDIVE_SCENEGRIDSYSTEM_H
+#ifndef THREEDIVE_SCENE_GRID_SYSTEM_H
+#define THREEDIVE_SCENE_GRID_SYSTEM_H
 
 #include <memory>
 #include <vector>
-
 #include "../platform/openGLRender/gl_vertex_array.h"
 #include "../platform/openGLRender/gl_vertex_buffer.h"
 #include "../platform/openGLRender/gl_shader_program.h"
 #include "../camera/camera_controller.h"
 #include "components.h"
+#include "scene.h"
 
 namespace s3Dive {
 
-    class SceneGridSystem {
+    class System {
+    public:
+        virtual ~System() = default;
+        virtual void update(Scene& scene, float deltaTime) = 0;
+        virtual void render(Scene& scene, GLShaderProgram& shaderProgram, const CameraController& cameraController) = 0;
+    };
+
+    class SceneGridSystem : public System {
     public:
         SceneGridSystem() = default;
-        ~SceneGridSystem() = default;
-        void render(SceneGridComponent &grid, GLShaderProgram& shaderProgram, const CameraController &cameraController);
+        ~SceneGridSystem() override = default;
+
+        void update(Scene& scene, float deltaTime) override;
+        void render(Scene& scene, GLShaderProgram& shaderProgram, const CameraController& cameraController) override;
 
     private:
         GLVertexArray vao_{};
@@ -41,10 +46,9 @@ namespace s3Dive {
         void initialize(SceneGridComponent& grid);
         [[nodiscard]] bool shouldRecalculateVisibility(float currentDistance) const;
         void calculateVisibility(float distanceToTarget);
+        void renderGrid(SceneGridComponent& grid, GLShaderProgram& shaderProgram, const CameraController& cameraController);
     };
 
+} // namespace s3Dive
 
-
-} // s3Dive
-
-#endif //THREEDIVE_SCENEGRIDSYSTEM_H
+#endif // THREEDIVE_SCENE_GRID_SYSTEM_H

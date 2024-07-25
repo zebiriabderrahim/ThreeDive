@@ -63,8 +63,8 @@ add_executable(ThreeDive
         source/core/uuid.cpp
         source/core/uuid.h
         source/scene/components.h
-        source/scene/SceneGridSystem.cpp
-        source/scene/SceneGridSystem.h
+        source/scene/sceneGridSystem.cpp
+        source/scene/sceneGridSystem.h
         source/core/geo_generator.cpp
         source/core/geo_generator.h
         source/scene/entity.cpp

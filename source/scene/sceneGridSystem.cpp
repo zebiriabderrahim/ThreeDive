@@ -1,12 +1,8 @@
-//
-// Created by ABDERRAHIM ZEBIRI on 2024-07-21.
-//
-
-#include "SceneGridSystem.h"
+#include "sceneGridSystem.h"
 #include "../renderer/RenderCommand.h"
 
-
 namespace s3Dive {
+
     void SceneGridSystem::initialize(SceneGridComponent &grid) {
         auto vbo = std::make_shared<GLVertexBuffer>(grid.vertices);
         GLVertexBufferLayout layout{};
@@ -23,25 +19,36 @@ namespace s3Dive {
 
     bool SceneGridSystem::shouldRecalculateVisibility(float currentDistance) const {
         return cachedDistanceToTarget_ < 0.0f ||
-                std::abs(currentDistance - cachedDistanceToTarget_) > kDistanceThreshold;
+               std::abs(currentDistance - cachedDistanceToTarget_) > kDistanceThreshold;
     }
 
     void SceneGridSystem::calculateVisibility(float distanceToTarget) {
         cachedDetailVisibility1_ = 1.0f - glm::clamp((distanceToTarget - kDetailVisibilityNear1)
-                                        / (kDetailVisibilityFar1 - kDetailVisibilityNear1), 0.0f, 1.0f);
+                                                     / (kDetailVisibilityFar1 - kDetailVisibilityNear1), 0.0f, 1.0f);
         cachedDetailVisibility2_ = 1.0f - glm::clamp((distanceToTarget - kDetailVisibilityNear2)
-                                        / (kDetailVisibilityFar2 - kDetailVisibilityNear2), 0.0f, 1.0f);
+                                                     / (kDetailVisibilityFar2 - kDetailVisibilityNear2), 0.0f, 1.0f);
         cachedDistanceToTarget_ = distanceToTarget;
     }
 
-    void SceneGridSystem::render(SceneGridComponent &grid, GLShaderProgram& shaderProgram, const CameraController &cameraController) {
+    void SceneGridSystem::update(Scene& scene, float deltaTime) {
+        // Any non-rendering logic, if needed
+    }
+
+    void SceneGridSystem::render(Scene& scene, GLShaderProgram& shaderProgram, const CameraController& cameraController) {
+        auto view = scene.view<SceneGridComponent>();
+        for (auto entity : view) {
+            auto& grid = view.get<SceneGridComponent>(entity);
+            renderGrid(grid, shaderProgram, cameraController);
+        }
+    }
+
+    void SceneGridSystem::renderGrid(SceneGridComponent& grid, GLShaderProgram& shaderProgram, const CameraController& cameraController) {
         if (!grid.isInitialized) {
             initialize(grid);
         }
 
-
         if (float currentDistanceToTarget = cameraController.getDistanceToTarget();
-                shouldRecalculateVisibility(currentDistanceToTarget)) {
+        shouldRecalculateVisibility(currentDistanceToTarget)) {
             calculateVisibility(currentDistanceToTarget);
         }
 
@@ -53,4 +60,5 @@ namespace s3Dive {
 
         shaderProgram.unuse();
     }
-} // s3Dive
+
+} // namespace s3Dive
