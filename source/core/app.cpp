@@ -8,22 +8,22 @@ namespace s3Dive {
 
     App::App(const std::shared_ptr<Window>& window) : window_(window) {
         window_->addEventListener(EventType::MouseMoved, [this](const EventVariant& event) {
-            cameraController_->onEvent(event);
+            cameraController_.onEvent(event);
         });
         window_->addEventListener(EventType::MouseButtonPressed, [this](const EventVariant& event) {
-            cameraController_->onEvent(event);
+            cameraController_.onEvent(event);
         });
         window_->addEventListener(EventType::MouseButtonReleased, [this](const EventVariant& event) {
-            cameraController_->onEvent(event);
+            cameraController_.onEvent(event);
         });
         window_->addEventListener(EventType::MouseScrolled, [this](const EventVariant& event) {
-            cameraController_->onEvent(event);
+            cameraController_.onEvent(event);
         });
         window_->addEventListener(EventType::KeyPressed, [this](const EventVariant& event) {
-            cameraController_->onEvent(event);
+            cameraController_.onEvent(event);
         });
         window_->addEventListener(EventType::WindowResize, [this](const EventVariant& event) {
-            cameraController_->onEvent(event);
+            cameraController_.onEvent(event);
         });
     }
 
@@ -31,13 +31,18 @@ namespace s3Dive {
 
     bool App::initialize() {
         RenderCommand::init();
-        initializeCamera();
         initializeGrid();
         initializeSystems();
+
 
         glEnable(GL_DEPTH_TEST);
 
         gridShader_.initFromFiles("grid.vert", "grid.frag");
+        shader_.initFromFiles("simple-shader.vs.glsl", "simple-shader.fs.glsl");
+
+        UUID modelEntityUUID {};
+        scene_.addComponent<ModelComponent>(modelEntityUUID, ModelComponent{"OS.obj", {}});
+        meshLoadingSystem_.loadModel(scene_, modelEntityUUID);
 
         return true;
     }
@@ -45,13 +50,14 @@ namespace s3Dive {
     void App::run() {
         while (!glfwWindowShouldClose(window_->getNativeWindow())) {
             window_->onUpdate();
-            cameraController_->update();
+            cameraController_.update();
 
 //            // Update systems
 //            for (auto& system : systems_) {
 //                system->update(scene_, window_->getDeltaTime());
 //            }
             systems_.update(scene_, 0);
+            meshLoadingSystem_.update(scene_, 0);
 
             onRender();
         }
@@ -61,44 +67,47 @@ namespace s3Dive {
         RenderCommand::clear(GLRenderer::BufferBit::Depth, GLRenderer::BufferBit::Color);
         RenderCommand::setClearColor(glm::vec4(0.266f, 0.26f, 0.25f, 1.0f));
 
-        gridShader_.use();
-
-        glm::mat4 model(1.0f);
-        gridShader_.updateShaderUniform("model", glm::value_ptr(model));
-
-        const auto& camera = cameraController_->getCamera();
+        const auto& camera = cameraController_.getCamera();
         glm::mat4 projection = camera.getProjectionMatrix();
+        glm::mat4 view = camera.getViewMatrix();
+        glm::mat4 model(1.0f);
+
+        // Set uniforms for grid shader
+        gridShader_.use();
+        gridShader_.updateShaderUniform("model", glm::value_ptr(model));
+        gridShader_.updateShaderUniform("view", glm::value_ptr(view));
         gridShader_.updateShaderUniform("projection", glm::value_ptr(projection));
 
-        glm::mat4 view = camera.getViewMatrix();
-        gridShader_.updateShaderUniform("view", glm::value_ptr(view));
+        // Render grid
+        systems_.render(scene_, gridShader_, cameraController_);
 
-        // Render systems
-//        for (auto& system : systems_) {
-//            system->render(scene_, gridShader_, *cameraController_);
-//        }
-        systems_.render(scene_, gridShader_, *cameraController_);
+        // Set uniforms for model shader
+        shader_.use();
+        shader_.updateShaderUniform("model", glm::value_ptr(model));
+        shader_.updateShaderUniform("view", glm::value_ptr(view));
+        shader_.updateShaderUniform("projection", glm::value_ptr(projection));
 
+        // Set default material properties
+        shader_.updateShaderUniform("objectColor", glm::vec3(0.8f, 0.8f, 0.8f));
+        shader_.updateShaderUniform("specularStrength", 0.5f);
+
+        // Set lighting properties
+        shader_.updateShaderUniform("lightPos", glm::vec3(10.0f, 10.0f, 10.0f));
+        shader_.updateShaderUniform("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+
+        // Set other uniforms
+        shader_.updateShaderUniform("useVertexColor", false); // Set to true if using vertex colors
+        shader_.updateShaderUniform("isWireframe", false); // Set to true for wireframe mode
+
+
+        // Render models
+        s3Dive::MeshLoadingSystem::render(scene_, shader_);
     }
 
-    void App::initializeCamera() {
-        CameraSettings cameraSettings;
-        cameraSettings.initialPosition = glm::vec3(40.0f, 40.0f, 40.0f);
-        cameraSettings.targetPosition = glm::vec3(0.0f, 0.0f, 0.0f);
-        cameraSettings.upVector = glm::vec3(0.0f, 0.0f, 1.0f);
-        cameraController_ = std::make_unique<CameraController>(cameraSettings);
-    }
 
     void App::initializeGrid() {
-        constexpr float gridSize = 10.0f;
-        constexpr float gridStep = 2.0f;
-        constexpr float extensionSize = 4.0f;
-        constexpr int fadeSteps = 5;
-
-        // Create grid entity in the scene
         auto gridEntity = scene_.createEntity();
-        scene_.addComponent<SceneGridComponent>(scene_.getEntityUUID(gridEntity).value(),
-                                                gridSize, gridStep, extensionSize, fadeSteps);
+        scene_.addComponent<SceneGridComponent>(scene_.getEntityUUID(gridEntity).value());
 
     }
 

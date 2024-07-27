@@ -23,17 +23,19 @@ namespace s3Dive {
 
     private:
         std::shared_ptr<Window> window_;
-        std::unique_ptr<CameraController> cameraController_;
+        CameraController cameraController_{};
         GLShaderProgram gridShader_;
+        GLShaderProgram shader_;
         GLVertexArray vao_;
         std::shared_ptr<GLVertexBuffer> vbo_;
         std::vector<float> gridVertices_;
 
         Scene scene_;
         SceneGridSystem systems_;
+        MeshLoadingSystem meshLoadingSystem_;
+
 
         void onRender();
-        void initializeCamera();
         void initializeGrid();
         void initializeSystems();
     };
