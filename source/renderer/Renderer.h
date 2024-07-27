@@ -20,7 +20,7 @@ namespace s3Dive {
         static void beginScene();
         static void endScene();
 
-        static void submit(const std::shared_ptr<GLVertexArray> &vertexArray);
+        static void submit(const GLVertexArray &vertexArray);
 
         static void shutdown();
 

@@ -28,7 +28,7 @@ namespace s3Dive {
         static void setClearColor(const glm::vec4& color) noexcept;
         static void setLineWidth(float width) noexcept;
 
-        static void drawIndexed(const GLVertexArray& vao) noexcept;
+        static void drawIndexed(const GLVertexArray& vao,GLuint indexCount) noexcept;
         static void drawLines(const GLVertexArray& vao, GLsizei indexCount) noexcept;
 
     private:
