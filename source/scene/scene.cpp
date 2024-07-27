@@ -2,14 +2,9 @@
 // Created by ABDERRAHIM ZEBIRI on 2024-07-20.
 //
 
-#include "sceneGridSystem.h"
-
 #include "scene.h"
-#include "entity.h"
-#include "components.h"
 
 namespace s3Dive {
-
 
     entt::entity Scene::createEntity() {
         UUID uuid{};
@@ -26,11 +21,9 @@ namespace s3Dive {
         }
     }
 
-    std::optional<entt::entity> Scene::getEntity(const UUID& uuid) const {
-        if (auto it = entitiesMap_.find(uuid); it != entitiesMap_.end()) {
-            return it->second;
-        }
-        return std::nullopt;
+    entt::entity Scene::getEntity(const UUID& uuid) const {
+        auto it = entitiesMap_.find(uuid);
+        return (it != entitiesMap_.end()) ? it->second : entt::null;
     }
 
     std::optional<UUID> Scene::getEntityUUID(entt::entity entity) const {
