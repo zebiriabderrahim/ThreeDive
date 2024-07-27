@@ -5,9 +5,9 @@
 
 namespace s3Dive {
 
-    UUID::UUID() : m_UUID(generateUUID()) {}
+    UUID::UUID() : UUID_(generateUUID()) {}
 
-    UUID::UUID(uint64_t value) noexcept : m_UUID(value) {}
+    UUID::UUID(uint64_t value) noexcept : UUID_(value) {}
 
     uint64_t UUID::generateUUID() {
         static std::random_device rd;
@@ -19,7 +19,7 @@ namespace s3Dive {
 
     std::string UUID::toString() const {
         std::stringstream ss;
-        ss << std::hex << std::setw(16) << std::setfill('0') << m_UUID;
+        ss << std::hex << std::setw(16) << std::setfill('0') << UUID_;
         return ss.str();
     }
 

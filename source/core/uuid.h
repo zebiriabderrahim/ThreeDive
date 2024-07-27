@@ -17,17 +17,17 @@ namespace s3Dive {
         UUID(UUID&&) noexcept = default;
         UUID& operator=(UUID&&) noexcept = default;
 
-        [[nodiscard]] constexpr uint64_t value() const noexcept { return m_UUID; }
-        [[nodiscard]] constexpr bool operator==(const UUID& other) const noexcept { return m_UUID == other.m_UUID; }
+        [[nodiscard]] constexpr uint64_t value() const noexcept { return UUID_; }
+        [[nodiscard]] constexpr bool operator==(const UUID& other) const noexcept { return UUID_ == other.UUID_; }
         [[nodiscard]] constexpr bool operator!=(const UUID& other) const noexcept { return !(*this == other); }
-        [[nodiscard]] constexpr bool operator<(const UUID& other) const noexcept { return m_UUID < other.m_UUID; }
+        [[nodiscard]] constexpr bool operator<(const UUID& other) const noexcept { return UUID_ < other.UUID_; }
 
         [[nodiscard]] std::string toString() const;
 
         friend std::ostream& operator<<(std::ostream& os, const UUID& uuid);
 
     private:
-        uint64_t m_UUID;
+        uint64_t UUID_;
         static uint64_t generateUUID();
     };
 
