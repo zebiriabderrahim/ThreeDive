@@ -9,14 +9,19 @@
 #include "../camera/camera_controller.h"
 #include "components.h"
 #include "scene.h"
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#include "scene.h"
+#include "../platform/openGLRender/gl_texture.h"
 
 namespace s3Dive {
 
     class System {
     public:
         virtual ~System() = default;
-        virtual void update(Scene& scene, float deltaTime) = 0;
-        virtual void render(Scene& scene, GLShaderProgram& shaderProgram, const CameraController& cameraController) = 0;
+        virtual void update(Scene& scene, float deltaTime) {};
+        virtual void render(Scene& scene, GLShaderProgram& shaderProgram, const CameraController& cameraController) {};
     };
 
     class SceneGridSystem : public System {
@@ -48,6 +53,22 @@ namespace s3Dive {
         void calculateVisibility(float distanceToTarget);
         void renderGrid(SceneGridComponent& grid, GLShaderProgram& shaderProgram, const CameraController& cameraController);
     };
+
+    class MeshLoadingSystem : public System {
+    public:
+        void update(Scene& scene, float deltaTime) override;
+        void loadModel(Scene& scene, const UUID& modelEntityUUID);
+        static void render(Scene& scene, GLShaderProgram& shaderProgram);
+
+    private:
+        void processNode(Scene& scene, aiNode* node, const aiScene* aiScene, const UUID& modelEntityUUID, int depth = 0);
+        MeshComponent processMesh(aiMesh* mesh, const aiScene* scene);
+        static void clearExistingMeshes(Scene& scene, const UUID& modelEntityUUID);
+        void initialize(MeshComponent& meshComponent);
+        static std::shared_ptr<GLTexture> loadMaterialTexture(const aiMaterial* mat, aiTextureType type);
+    };
+
+
 
 } // namespace s3Dive
 
