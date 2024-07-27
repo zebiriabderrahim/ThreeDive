@@ -7,6 +7,8 @@
 
 #include <string>
 #include "../core/geo_generator.h"
+#include "../core/uuid.h"
+#include "../platform/openGLRender/gl_texture.h"
 
 namespace s3Dive {
 
@@ -16,9 +18,23 @@ namespace s3Dive {
         glm::vec3 scale{1.0f, 1.0f, 1.0f};
     };
 
+    struct Vertex {
+        glm::vec3 Position;
+        glm::vec3 Normal;
+        glm::vec2 TexCoords;
+    };
+
     struct MeshComponent {
-        std::string meshFilePath;
-        // Add other mesh-related properties here, like material, textures, etc.
+        std::vector<Vertex> vertices;
+        std::vector<unsigned int> indices;
+        std::shared_ptr<GLVertexBuffer> vertexBuffer;
+        std::shared_ptr<GLVertexArray> vertexArray;
+        std::shared_ptr<GLTexture> texture;
+        bool isInitialized = false;
+    };
+    struct ModelComponent {
+        std::string filepath;
+        std::vector<s3Dive::UUID> meshEntities;  // UUIDs of associated mesh entities
     };
 
     struct SceneGridComponent {
@@ -29,7 +45,7 @@ namespace s3Dive {
         bool isInitialized{false};
         std::vector<float> vertices;
 
-        explicit SceneGridComponent(float size, float step, float extensionSize, int fadeSteps)
+        explicit SceneGridComponent(float size= 10.0f, float step = 2.0f, float extensionSize = 4.0f, int fadeSteps = 5)
                 : size_(size), step_(step), extensionSize_(extensionSize), fadeSteps_(fadeSteps),
                 vertices(geo::generateDetailedGridVertices(size_, step_, extensionSize_, fadeSteps_)) {}
     };
