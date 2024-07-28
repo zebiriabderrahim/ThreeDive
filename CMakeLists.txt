@@ -69,6 +69,9 @@ add_executable(ThreeDive
         source/core/geo_generator.h
         source/scene/entity.cpp
         source/scene/entity.h
+        source/scene/system.h
+        source/scene/MeshLoadingSystem.cpp
+        source/scene/MeshLoadingSystem.h
 )
 
 add_custom_command(TARGET ThreeDive
