@@ -3,6 +3,7 @@
 #include "../renderer/RenderCommand.h"
 #include "geo_generator.h"
 #include "window.h"
+#include "../scene/MeshLoadingSystem.h"
 
 namespace s3Dive {
 
@@ -101,7 +102,7 @@ namespace s3Dive {
 
 
         // Render models
-        s3Dive::MeshLoadingSystem::render(scene_, shader_);
+        MeshLoadingSystem::render(scene_, shader_);
     }
 
 

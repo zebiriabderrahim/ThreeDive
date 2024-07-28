@@ -9,6 +9,7 @@
 #include "../core/geo_generator.h"
 #include "../core/uuid.h"
 #include "../platform/openGLRender/gl_texture.h"
+#include "../platform/openGLRender/gl_vertex_array.h"
 
 namespace s3Dive {
 

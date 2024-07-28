@@ -5,6 +5,8 @@
 #ifndef THREEDIVE_GL_TEXTURE_H
 #define THREEDIVE_GL_TEXTURE_H
 
+#include <glad/glad.h>
+
 namespace s3Dive {
 
     class GLTexture {

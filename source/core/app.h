@@ -8,6 +8,7 @@
 #include "../scene/scene.h"
 #include "../scene/sceneGridSystem.h"
 #include "window.h"
+#include "../scene/MeshLoadingSystem.h"
 #include <memory>
 #include <vector>
 
