@@ -83,11 +83,8 @@ namespace s3Dive {
 
         const aiScene *aiScene = importer.ReadFile(modelComponent.filepath,
                                                    aiProcess_Triangulate |
-                                                   aiProcess_FlipUVs |
-                                                   aiProcess_CalcTangentSpace |
-                                                   aiProcess_GenNormals |
-                                                   aiProcess_JoinIdenticalVertices |
-                                                   aiProcess_SortByPType);
+                                                   aiProcess_FlipUVs);
+
 
         if (!aiScene || aiScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !aiScene->mRootNode) {
             std::cerr << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
@@ -97,7 +94,7 @@ namespace s3Dive {
         std::cout << "Meshes in scene: " << aiScene->mNumMeshes << std::endl;
         std::cout << "Root node children: " << aiScene->mRootNode->mNumChildren << std::endl;
 
-        clearExistingMeshes(scene, modelEntityUUID);
+        //clearExistingMeshes(scene, modelEntityUUID);
         processNode(scene, aiScene->mRootNode, aiScene, modelEntityUUID);
     }
 
@@ -139,9 +136,7 @@ namespace s3Dive {
     MeshComponent MeshLoadingSystem::processMesh(aiMesh *mesh, const aiScene *scene) {
         MeshComponent meshComponent;
 
-        std::cout << "Processing mesh: " << mesh->mName.C_Str()
-                  << ", Vertices: " << mesh->mNumVertices
-                  << ", Faces: " << mesh->mNumFaces << std::endl;
+        spdlog::info("Processing mesh with {} vertices and {} indices", mesh->mNumVertices, mesh->mNumFaces);
 
         // Process vertices
         for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
@@ -219,8 +214,8 @@ namespace s3Dive {
             vertexData.push_back(vertex.Normal.y);
             vertexData.push_back(vertex.Normal.z);
             // TexCoords
-            vertexData.push_back(vertex.TexCoords.x);
-            vertexData.push_back(vertex.TexCoords.y);
+//            vertexData.push_back(vertex.TexCoords.x);
+//            vertexData.push_back(vertex.TexCoords.y);
         }
 
         // Create and set up the vertex buffer
@@ -228,7 +223,7 @@ namespace s3Dive {
         GLVertexBufferLayout layout;
         layout.addVertexElement<float>(3); // Position
         layout.addVertexElement<float>(3); // Normal
-        layout.addVertexElement<float>(2); // TexCoords
+        //layout.addVertexElement<float>(2); // TexCoords
         meshComponent.vertexBuffer->setLayout(layout);
 
         // Create and set up the vertex array
@@ -261,7 +256,7 @@ namespace s3Dive {
             mesh.vertexArray->bind();
 
             // Solid rendering
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             RenderCommand::drawIndexed(*mesh.vertexArray , mesh.indices.size());
 
 

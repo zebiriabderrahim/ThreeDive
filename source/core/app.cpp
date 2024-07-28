@@ -41,7 +41,7 @@ namespace s3Dive {
         shader_.initFromFiles("simple-shader.vs.glsl", "simple-shader.fs.glsl");
 
         UUID modelEntityUUID {};
-        scene_.addComponent<ModelComponent>(modelEntityUUID, ModelComponent{"OS.obj", {}});
+        scene_.addComponent<ModelComponent>(modelEntityUUID, ModelComponent{"cube.fbx", {}});
         meshLoadingSystem_.loadModel(scene_, modelEntityUUID);
 
         return true;

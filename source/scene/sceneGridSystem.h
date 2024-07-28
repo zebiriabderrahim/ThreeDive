@@ -64,7 +64,7 @@ namespace s3Dive {
         void processNode(Scene& scene, aiNode* node, const aiScene* aiScene, const UUID& modelEntityUUID, int depth = 0);
         MeshComponent processMesh(aiMesh* mesh, const aiScene* scene);
         static void clearExistingMeshes(Scene& scene, const UUID& modelEntityUUID);
-        void initialize(MeshComponent& meshComponent);
+        static void initialize(MeshComponent& meshComponent);
         static std::shared_ptr<GLTexture> loadMaterialTexture(const aiMaterial* mat, aiTextureType type);
     };
 
