@@ -10,6 +10,7 @@ find_package(stb REQUIRED)
 find_package(glm REQUIRED)
 find_package(freetype REQUIRED)
 find_package(assimp REQUIRED)
+find_package(EnTT REQUIRED)
 
 add_executable(ThreeDive
         source/main.cpp
@@ -39,31 +40,39 @@ add_executable(ThreeDive
         source/platform/openGLRender/gl_uniform_buffer.h
         source/platform/openGLRender/gl_renderer.cpp
         source/platform/openGLRender/gl_renderer.h
-        source/renderer/ortho_camera.cpp
-        source/renderer/ortho_camera.h
-        source/renderer/ICamera.h
-        source/renderer/perspective_camera.cpp
-        source/renderer/perspective_camera.h
-        source/renderer/CameraController.cpp
-        source/renderer/CameraController.h
-        source/scene/scene_node.cpp
-        source/scene/scene_node.h source/core/event.h
+        source/camera/orthographic_camera.cpp
+        source/camera/orthographic_camera.h
+        source/camera/perspective_camera.cpp
+        source/camera/perspective_camera.h
+        source/camera/camera_controller.cpp
+        source/camera/camera_controller.h
+        source/events/event.h
         source/core/memory_and_binding.h
-        source/core/key_codes.h
+        source/events/key_codes.h
         source/core/app.cpp
         source/core/app.h
-        source/core/geo_util.h
         source/core/window.cpp
         source/core/window.h
-        source/scene/SceneGrid.cpp
-        source/scene/SceneGrid.h
-#        scene/ViewCube.cpp
-#        scene/ViewCube.h
         source/renderer/RenderCommand.cpp
         source/renderer/RenderCommand.h
-        source/core/event_type.h
-        source/scene/Model.cpp
-        source/scene/Model.h source/renderer/Renderer.cpp source/renderer/Renderer.h)
+        source/events/event_type.h
+        source/renderer/Renderer.cpp
+        source/renderer/Renderer.h
+        source/scene/scene.cpp
+        source/scene/scene.h
+        source/core/uuid.cpp
+        source/core/uuid.h
+        source/scene/components.h
+        source/scene/sceneGridSystem.cpp
+        source/scene/sceneGridSystem.h
+        source/core/geo_generator.cpp
+        source/core/geo_generator.h
+        source/scene/entity.cpp
+        source/scene/entity.h
+        source/scene/system.h
+        source/scene/MeshLoadingSystem.cpp
+        source/scene/MeshLoadingSystem.h
+)
 
 add_custom_command(TARGET ThreeDive
         POST_BUILD
@@ -72,10 +81,11 @@ add_custom_command(TARGET ThreeDive
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/assets/grid.vert $<TARGET_FILE_DIR:ThreeDive>
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/assets/grid.frag $<TARGET_FILE_DIR:ThreeDive>
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/assets/wall.jpg $<TARGET_FILE_DIR:ThreeDive>
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/assets/OS.obj $<TARGET_FILE_DIR:ThreeDive>
         )
 
-target_compile_definitions(ThreeDive PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW)
-target_link_libraries(ThreeDive imgui::imgui glfw glad::glad spdlog::spdlog stb::stb glm::glm freetype assimp::assimp)
+target_compile_definitions(ThreeDive PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW ENTT_INCLUDE_NATVIS)
+target_link_libraries(ThreeDive imgui::imgui glfw glad::glad spdlog::spdlog stb::stb glm::glm freetype assimp::assimp EnTT::EnTT)
 
 #add_subdirectory(tests)
 

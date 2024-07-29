@@ -19,8 +19,8 @@ namespace s3Dive {
 
     }
 
-    void Renderer::submit(const std::shared_ptr<GLVertexArray> &vertexArray) {
-        RenderCommand::drawIndexed( *vertexArray);
+    void Renderer::submit(const GLVertexArray& vertexArray) {
+        RenderCommand::drawIndexed( vertexArray, vertexArray.getIndexBuffer()->getCount());
 
     }
 

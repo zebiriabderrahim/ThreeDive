@@ -35,9 +35,9 @@ namespace s3Dive {
         getRenderer().setLineWidth(width);
     }
 
-    void RenderCommand::drawIndexed(const GLVertexArray& vao) noexcept {
+    void RenderCommand::drawIndexed(const GLVertexArray& vao,GLuint indexCount) noexcept {
         vao.bind();
-        getRenderer().drawIndexed(vao);
+        getRenderer().drawIndexed(vao, indexCount);
     }
 
      void RenderCommand::drawLines(const GLVertexArray& vao, GLsizei indexCount) noexcept {

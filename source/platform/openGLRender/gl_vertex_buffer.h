@@ -1,7 +1,6 @@
 //
 // Created by ABDERRAHIM ZEBIRI on 2024-06-25.
 //
-#pragma once
 
 #ifndef THREEDIVE_GL_VERTEX_BUFFER_H
 #define THREEDIVE_GL_VERTEX_BUFFER_H

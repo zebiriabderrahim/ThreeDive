@@ -1,7 +1,6 @@
 //
 // Created by ABDERRAHIM ZEBIRI on 2024-07-07.
 //
-#pragma once
 
 #ifndef THREEDIVE_INPUTMANAGER_H
 #define THREEDIVE_INPUTMANAGER_H
@@ -9,7 +8,7 @@
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
-#include "key_codes.h"
+#include "../events/key_codes.h"
 
 
 namespace s3Dive {

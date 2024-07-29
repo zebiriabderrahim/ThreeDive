@@ -1,7 +1,6 @@
 //
 // Created by ABDERRAHIM ZEBIRI on 2024-06-24.
 //
-#pragma once
 
 #ifndef THREEDIVE_GL_SHADER_PROGRAM_H
 #define THREEDIVE_GL_SHADER_PROGRAM_H
