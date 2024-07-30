@@ -18,6 +18,29 @@ namespace s3Dive {
         glm::vec3 rotation{0.0f, 0.0f, 0.0f};
         glm::vec3 scale{1.0f, 1.0f, 1.0f};
     };
+    struct MaterialComponent {
+        glm::vec3 ambient{0.1f, 0.1f, 0.1f};
+        glm::vec3 diffuse{0.8f, 0.8f, 0.8f};
+        glm::vec3 specular{0.5f, 0.5f, 0.5f};
+        float shininess{32.0f};
+        std::shared_ptr<GLTexture> diffuseTexture;
+        bool useTexture{false};
+
+        MaterialComponent() = default;
+        MaterialComponent(glm::vec3 amb, glm::vec3 diff, glm::vec3 spec, float shin)
+                : ambient(amb), diffuse(diff), specular(spec), shininess(shin) {}
+    };
+
+    struct LightComponent {
+        glm::vec3 position{0.0f, 5.0f, 5.0f};
+        glm::vec3 color{1.0f, 1.0f, 1.0f};
+        float intensity{1.0f};
+        enum class LightType { Key, Fill, Point, Directional, Spot } type{LightType::Key};
+
+        LightComponent() = default;
+        LightComponent(glm::vec3 pos, glm::vec3 col, float intens, LightType t)
+                : position(pos), color(col), intensity(intens), type(t) {}
+    };
 
     struct Vertex {
         glm::vec3 Position;
@@ -31,6 +54,11 @@ namespace s3Dive {
         std::shared_ptr<GLVertexBuffer> vertexBuffer;
         std::shared_ptr<GLVertexArray> vertexArray;
         std::shared_ptr<GLTexture> texture;
+
+        glm::vec3 ambientColor = glm::vec3(0.1f, 0.1f, 0.1f);
+        glm::vec3 diffuseColor = glm::vec3(0.8f, 0.8f, 0.8f);
+        glm::vec3 specularColor = glm::vec3(1.0f, 1.0f, 1.0f);
+        float shininess = 32.0f;
         bool isInitialized = false;
     };
     struct ModelComponent {
