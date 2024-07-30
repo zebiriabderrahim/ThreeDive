@@ -39,7 +39,7 @@ namespace s3Dive {
         glEnable(GL_DEPTH_TEST);
 
         gridShader_.initFromFiles("grid.vert", "grid.frag");
-        shader_.initFromFiles("simple-shader.vs.glsl", "simple-shader.fs.glsl");
+        defaultShaderProgram_.initFromFiles("simple-shader.vs.glsl", "simple-shader.fs.glsl");
 
         UUID modelEntityUUID {};
         scene_.addComponent<ModelComponent>(modelEntityUUID, ModelComponent{"cube.fbx", {}});
@@ -52,13 +52,8 @@ namespace s3Dive {
         while (!glfwWindowShouldClose(window_->getNativeWindow())) {
             window_->onUpdate();
             cameraController_.update();
-
-//            // Update systems
-//            for (auto& system : systems_) {
-//                system->update(scene_, window_->getDeltaTime());
-//            }
             systems_.update(scene_, 0);
-            meshLoadingSystem_.update(scene_, 0);
+            defaultRenderSystem.update(scene_, 0);
 
             onRender();
         }
@@ -83,26 +78,15 @@ namespace s3Dive {
         systems_.render(scene_, gridShader_, cameraController_);
 
         // Set uniforms for model shader
-        shader_.use();
-        shader_.updateShaderUniform("model", glm::value_ptr(model));
-        shader_.updateShaderUniform("view", glm::value_ptr(view));
-        shader_.updateShaderUniform("projection", glm::value_ptr(projection));
-
-        // Set default material properties
-        shader_.updateShaderUniform("objectColor", glm::vec3(0.8f, 0.8f, 0.8f));
-        shader_.updateShaderUniform("specularStrength", 0.5f);
-
-        // Set lighting properties
-        shader_.updateShaderUniform("lightPos", glm::vec3(10.0f, 10.0f, 10.0f));
-        shader_.updateShaderUniform("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-
-        // Set other uniforms
-        shader_.updateShaderUniform("useVertexColor", false); // Set to true if using vertex colors
-        shader_.updateShaderUniform("isWireframe", false); // Set to true for wireframe mode
+        defaultShaderProgram_.use();
+        defaultShaderProgram_.updateShaderUniform("model", glm::value_ptr(model));
+        defaultShaderProgram_.updateShaderUniform("view", glm::value_ptr(view));
+        defaultShaderProgram_.updateShaderUniform("projection", glm::value_ptr(projection));
 
 
-        // Render models
-        MeshLoadingSystem::render(scene_, shader_);
+
+        // Render model
+        defaultRenderSystem.render(scene_, defaultShaderProgram_);
     }
 
 
