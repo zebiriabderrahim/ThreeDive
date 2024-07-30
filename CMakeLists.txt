@@ -72,6 +72,8 @@ add_executable(ThreeDive
         source/scene/system.h
         source/scene/MeshLoadingSystem.cpp
         source/scene/MeshLoadingSystem.h
+        source/scene/DefaultRenderSystem.cpp
+        source/scene/DefaultRenderSystem.h
 )
 
 add_custom_command(TARGET ThreeDive
