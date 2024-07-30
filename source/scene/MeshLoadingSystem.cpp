@@ -1,11 +1,9 @@
-//
-// Created by ABDERRAHIM ZEBIRI on 2024-07-27.
-//
 #include <spdlog/spdlog.h>
-#include "../renderer/RenderCommand.h"
 #include "MeshLoadingSystem.h"
+#include "../renderer/RenderCommand.h"
 
 namespace s3Dive {
+
     void MeshLoadingSystem::update(Scene &scene, float deltaTime) {
         // This method could be used to check for any new models that need loading
         // For now, we'll leave it empty as loading will be triggered manually
@@ -13,16 +11,10 @@ namespace s3Dive {
 
     void MeshLoadingSystem::loadModel(Scene &scene, const UUID &modelEntityUUID) {
         const auto &modelComponent = scene.getComponent<ModelComponent>(modelEntityUUID);
-
         std::cout << "Loading model: " << modelComponent.filepath << std::endl;
 
         Assimp::Importer importer;
-
-        const aiScene *aiScene = importer.ReadFile(modelComponent.filepath,
-                                                   aiProcess_Triangulate |
-                                                   aiProcess_FlipUVs);
-
-
+        const aiScene *aiScene = importer.ReadFile(modelComponent.filepath, aiProcess_Triangulate | aiProcess_FlipUVs);
         if (!aiScene || aiScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !aiScene->mRootNode) {
             std::cerr << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
             return;
@@ -31,23 +23,20 @@ namespace s3Dive {
         std::cout << "Meshes in scene: " << aiScene->mNumMeshes << std::endl;
         std::cout << "Root node children: " << aiScene->mRootNode->mNumChildren << std::endl;
 
-        //clearExistingMeshes(scene, modelEntityUUID);
+        clearExistingMeshes(scene, modelEntityUUID);
         processNode(scene, aiScene->mRootNode, aiScene, modelEntityUUID);
     }
 
     void MeshLoadingSystem::clearExistingMeshes(Scene &scene, const UUID &modelEntityUUID) {
         auto &modelComponent = scene.getComponent<ModelComponent>(modelEntityUUID);
-
         std::cout << "Clearing existing meshes for model: " << modelEntityUUID << std::endl;
-
         for (const auto &meshUUID: modelComponent.meshEntities) {
             scene.destroyEntity(meshUUID);
         }
         modelComponent.meshEntities.clear();
     }
 
-    void MeshLoadingSystem::processNode(Scene &scene, aiNode *node, const aiScene *aiScene, const UUID &modelEntityUUID,
-                                        int depth) {
+    void MeshLoadingSystem::processNode(Scene &scene, aiNode *node, const aiScene *aiScene, const UUID &modelEntityUUID, int depth) {
         std::cout << std::string(depth * 2, ' ') << "Processing node: "
                   << (node->mName.length > 0 ? node->mName.C_Str() : "Unnamed")
                   << ", Meshes: " << node->mNumMeshes << std::endl;
@@ -55,12 +44,9 @@ namespace s3Dive {
         for (unsigned int i = 0; i < node->mNumMeshes; i++) {
             aiMesh *mesh = aiScene->mMeshes[node->mMeshes[i]];
             MeshComponent meshComponent = processMesh(mesh, aiScene);
-
             UUID meshEntityUUID{};
             std::cout << "Created mesh entity: " << meshEntityUUID << " for model: " << modelEntityUUID << std::endl;
-
-            scene.addComponent<MeshComponent>(meshEntityUUID, std::move(meshComponent));
-
+            scene.addComponent<MeshComponent>(meshEntityUUID, meshComponent);
             auto &modelComponent = scene.getComponent<ModelComponent>(modelEntityUUID);
             modelComponent.meshEntities.push_back(meshEntityUUID);
         }
@@ -72,24 +58,20 @@ namespace s3Dive {
 
     MeshComponent MeshLoadingSystem::processMesh(aiMesh *mesh, const aiScene *scene) {
         MeshComponent meshComponent;
-
         spdlog::info("Processing mesh with {} vertices and {} indices", mesh->mNumVertices, mesh->mNumFaces);
 
         // Process vertices
         for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
             Vertex vertex{};
             vertex.Position = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
-
             if (mesh->HasNormals()) {
                 vertex.Normal = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
             }
-
             if (mesh->mTextureCoords[0]) {
                 vertex.TexCoords = glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
             } else {
                 vertex.TexCoords = glm::vec2(0.0f, 0.0f);
             }
-
             meshComponent.vertices.push_back(vertex);
         }
 
@@ -107,17 +89,40 @@ namespace s3Dive {
             meshComponent.texture = loadMaterialTexture(material, aiTextureType_DIFFUSE);
         }
 
-        initialize(meshComponent);
+        meshComponent.ambientColor = glm::vec3(0.1f, 0.1f, 0.1f);
+        meshComponent.diffuseColor = glm::vec3(0.8f, 0.8f, 0.8f);
+        meshComponent.specularColor = glm::vec3(1.0f, 1.0f, 1.0f);
+        meshComponent.shininess = 32.0f;
 
+        // Process material if available
+        if (mesh->mMaterialIndex >= 0) {
+            const aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+
+            // Load texture
+            meshComponent.texture = loadMaterialTexture(material, aiTextureType_DIFFUSE);
+
+            // Load material colors if available
+            aiColor3D color(0.f, 0.f, 0.f);
+            if (material->Get(AI_MATKEY_COLOR_AMBIENT, color) == AI_SUCCESS)
+                meshComponent.ambientColor = glm::vec3(color.r, color.g, color.b);
+            if (material->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS)
+                meshComponent.diffuseColor = glm::vec3(color.r, color.g, color.b);
+            if (material->Get(AI_MATKEY_COLOR_SPECULAR, color) == AI_SUCCESS)
+                meshComponent.specularColor = glm::vec3(color.r, color.g, color.b);
+
+            float shininess;
+            if (material->Get(AI_MATKEY_SHININESS, shininess) == AI_SUCCESS)
+                meshComponent.shininess = shininess;
+        }
+
+        initializeMeshForRendering(meshComponent);
         return meshComponent;
     }
 
     std::shared_ptr<GLTexture> MeshLoadingSystem::loadMaterialTexture(const aiMaterial* mat, aiTextureType type) {
-        // Debug output
         std::cout << "Attempting to load texture of type: " << type << std::endl;
         std::cout << "Texture count: " << mat->GetTextureCount(type) << std::endl;
 
-        // Check for diffuse textures
         if (mat->GetTextureCount(type) > 0) {
             aiString str;
             mat->GetTexture(type, 0, &str);
@@ -125,7 +130,6 @@ namespace s3Dive {
             return std::make_shared<GLTexture>(str.C_Str());
         }
 
-        // If no diffuse texture, check for ambient textures
         if (type == aiTextureType_DIFFUSE && mat->GetTextureCount(aiTextureType_AMBIENT) > 0) {
             aiString str;
             mat->GetTexture(aiTextureType_AMBIENT, 0, &str);
@@ -133,72 +137,37 @@ namespace s3Dive {
             return std::make_shared<GLTexture>(str.C_Str());
         }
 
-        // If still no texture found, use a default texture
         std::cout << "No texture found, using default texture." << std::endl;
         return std::make_shared<GLTexture>("wall.jpg");
     }
 
-    void MeshLoadingSystem::initialize(MeshComponent &meshComponent) {
-        // Convert Vertex struct to a flat array of floats
+    void MeshLoadingSystem::initializeMeshForRendering(MeshComponent &meshComponent) {
         std::vector<float> vertexData;
-        for (const auto &vertex: meshComponent.vertices) {
-            // Position
+        for (const auto &vertex : meshComponent.vertices) {
             vertexData.push_back(vertex.Position.x);
             vertexData.push_back(vertex.Position.y);
             vertexData.push_back(vertex.Position.z);
-            // Normal
             vertexData.push_back(vertex.Normal.x);
             vertexData.push_back(vertex.Normal.y);
             vertexData.push_back(vertex.Normal.z);
-            // TexCoords
-//            vertexData.push_back(vertex.TexCoords.x);
-//            vertexData.push_back(vertex.TexCoords.y);
+            vertexData.push_back(vertex.TexCoords.x);
+            vertexData.push_back(vertex.TexCoords.y);
         }
 
-        // Create and set up the vertex buffer
         meshComponent.vertexBuffer = std::make_shared<GLVertexBuffer>(vertexData);
         GLVertexBufferLayout layout;
         layout.addVertexElement<float>(3); // Position
         layout.addVertexElement<float>(3); // Normal
-        //layout.addVertexElement<float>(2); // TexCoords
+        layout.addVertexElement<float>(2); // TexCoords
         meshComponent.vertexBuffer->setLayout(layout);
 
-        // Create and set up the vertex array
         meshComponent.vertexArray = std::make_shared<GLVertexArray>();
         meshComponent.vertexArray->addVertexBuffer(meshComponent.vertexBuffer);
 
-        // Set up the index buffer
         auto indexBuffer = std::make_shared<GLIndexBuffer>(meshComponent.indices);
         meshComponent.vertexArray->setIndexBuffer(indexBuffer);
 
         meshComponent.isInitialized = true;
     }
 
-    void MeshLoadingSystem::render(Scene& scene, GLShaderProgram& shaderProgram) {
-        auto view = scene.view<MeshComponent>();
-        for (auto entity : view) {
-            const auto& mesh = view.get<MeshComponent>(entity);
-
-            if (!mesh.isInitialized || !mesh.vertexArray) {
-                continue;
-            }
-
-            shaderProgram.use();
-            shaderProgram.updateShaderUniform("useTexture", mesh.texture != nullptr);
-
-            if (mesh.texture) {
-                mesh.texture->bind();
-            }
-
-            mesh.vertexArray->bind();
-
-            // Solid rendering
-            //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-            RenderCommand::drawIndexed(*mesh.vertexArray , mesh.indices.size());
-
-
-            mesh.vertexArray->unbind();
-            shaderProgram.unuse();
-        }
-    }
 } // s3Dive
