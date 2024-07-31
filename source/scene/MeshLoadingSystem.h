@@ -17,14 +17,12 @@ namespace s3Dive {
 
     class MeshLoadingSystem : public System {
     public:
-        void update(Scene& scene, float deltaTime) override;
         void loadModel(Scene& scene, const UUID& modelEntityUUID);
 
     private:
-        void processNode(Scene& scene, aiNode* node, const aiScene* aiScene, const UUID& modelEntityUUID, int depth = 0);
-        MeshComponent processMesh(aiMesh* mesh, const aiScene* scene);
-        static void clearExistingMeshes(Scene& scene, const UUID& modelEntityUUID);
-        static void initializeMeshForRendering(MeshComponent& meshComponent);
+        void processNode(Scene& scene, const aiNode* node, const aiScene* aiScene, const UUID& modelEntityUUID, int depth = 0);
+        MeshComponent processMesh(const aiMesh* mesh, const aiScene* scene);
+        MaterialComponent processMaterial(const aiMaterial* material);
         static std::shared_ptr<GLTexture> loadMaterialTexture(const aiMaterial* mat, aiTextureType type);
     };
 
