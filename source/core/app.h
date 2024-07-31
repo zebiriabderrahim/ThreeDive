@@ -9,7 +9,7 @@
 #include "../scene/sceneGridSystem.h"
 #include "window.h"
 #include "../scene/MeshLoadingSystem.h"
-#include "../scene/DefaultRenderSystem.h"
+#include "../scene/RenderSystem.h"
 #include <memory>
 #include <vector>
 
@@ -34,13 +34,15 @@ namespace s3Dive {
 
         Scene scene_;
         SceneGridSystem systems_;
-        DefaultRenderSystem defaultRenderSystem;
+        RenderSystem defaultRenderSystem;
         MeshLoadingSystem meshLoadingSystem_;
 
 
         void onRender();
         void initializeGrid();
         void initializeSystems();
+
+        void createDefaultLights();
     };
 
 } // namespace s3Dive
