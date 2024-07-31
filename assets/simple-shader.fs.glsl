@@ -1,46 +1,39 @@
 #version 330 core
+
 out vec4 FragColor;
 
+in vec2 TexCoord;
 in vec3 FragPos;
 in vec3 Normal;
-in vec2 TexCoords;
 
-struct Material {
-	vec3 ambient;
-	vec3 diffuse;
-	vec3 specular;
-	float shininess;
-};
-
-uniform Material material;
-uniform bool useTexture;
-uniform sampler2D texture_diffuse1;
-
-uniform vec3 lightPos;
-uniform vec3 viewPos;
+uniform float viewPos;
+uniform vec3 lightColor;
+uniform float ambientStrength;
+uniform vec3 albedo;
 
 void main()
 {
+	// Normalize the normal vector
 	vec3 norm = normalize(Normal);
-	vec3 lightDir = normalize(lightPos - FragPos);
+
+	// Calculate view direction
 	vec3 viewDir = normalize(viewPos - FragPos);
-	vec3 reflectDir = reflect(-lightDir, norm);
 
-	// Ambient
-	vec3 ambient = material.ambient;
+	// Ambient lighting
+	vec3 ambient = ambientStrength * lightColor;
 
-	// Diffuse
-	float diff = max(dot(norm, lightDir), 0.0);
-	vec3 diffuse = diff * material.diffuse;
+	// Soft diffuse lighting
+	float diff = max(dot(norm, vec3(0.0, 1.0, 0.0)), 0.0) * 0.5 + 0.5;
+	vec3 diffuse = diff * lightColor;
 
-	// Specular
-	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-	vec3 specular = material.specular * spec;
+	// Combine results
+	vec3 result = (ambient + diffuse) * albedo;
 
-	vec3 result = ambient + diffuse + specular;
+	// Apply simple tone mapping
+	result = result / (result + vec3(1.0));
 
-	if (useTexture)
-	result *= texture(texture_diffuse1, TexCoords).rgb;
+	// Apply gamma correction
+	result = pow(result, vec3(1.0/2.2));
 
 	FragColor = vec4(result, 1.0);
 }
