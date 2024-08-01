@@ -1,63 +1,89 @@
-#include <spdlog/spdlog.h>
 #include "MeshLoadingSystem.h"
 #include "../renderer/RenderCommand.h"
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <spdlog/spdlog.h>
 
 namespace s3Dive {
-
 
     void MeshLoadingSystem::loadModel(Scene& scene, const UUID& modelEntityUUID) {
         const auto& modelComponent = scene.getComponent<ModelComponent>(modelEntityUUID);
 
-        std::cout << "Loading model: " << modelComponent.filepath << std::endl;
+        spdlog::info("Loading model: {}", modelComponent.filepath);
 
         Assimp::Importer importer;
+        constexpr unsigned int importFlags =
+                aiProcess_Triangulate |
+                aiProcess_FlipUVs |
+                aiProcess_CalcTangentSpace |
+                aiProcess_GenNormals |
+                aiProcess_JoinIdenticalVertices |
+                aiProcess_SortByPType;
 
-        const aiScene* aiScene = importer.ReadFile(modelComponent.filepath,
-                                                   aiProcess_Triangulate |
-                                                   aiProcess_FlipUVs |
-                                                   aiProcess_CalcTangentSpace |
-                                                   aiProcess_GenNormals |
-                                                   aiProcess_JoinIdenticalVertices |
-                                                   aiProcess_SortByPType);
+        const aiScene* aiScene = importer.ReadFile(modelComponent.filepath, importFlags);
 
         if (!aiScene || aiScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !aiScene->mRootNode) {
-            std::cerr << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
-            return;
+            throw std::runtime_error(fmt::format("ERROR::ASSIMP::{}", importer.GetErrorString()));
         }
 
-        std::cout << "Meshes in scene: " << aiScene->mNumMeshes << std::endl;
-        std::cout << "Root node children: " << aiScene->mRootNode->mNumChildren << std::endl;
+        spdlog::info("Meshes in scene: {}", aiScene->mNumMeshes);
+        spdlog::info("Root node children: {}", aiScene->mRootNode->mNumChildren);
 
-        processNode(scene, aiScene->mRootNode, aiScene, modelEntityUUID);
+        processNode(scene, aiScene->mRootNode, aiScene, modelEntityUUID, glm::mat4(1.0f));
     }
 
-    void MeshLoadingSystem::processNode(Scene& scene, const aiNode* node, const aiScene* aiScene, const UUID& modelEntityUUID, int depth) {
+    void MeshLoadingSystem::processNode(Scene& scene, const aiNode* node, const aiScene* aiScene,
+                                        const UUID& modelEntityUUID, glm::mat4 parentTransform) {
+        // Extract the transformation matrix from the node and combine it with the parent transform
+        aiMatrix4x4 aiTransform = node->mTransformation;
+        aiTransform.Transpose(); // Assimp uses row-major matrices, we need column-major for glm
+
+        glm::mat4 nodeTransform = parentTransform * glm::make_mat4(&aiTransform.a1);
+
         for (unsigned int i = 0; i < node->mNumMeshes; i++) {
-            aiMesh const* mesh = aiScene->mMeshes[node->mMeshes[i]];
+            const aiMesh* mesh = aiScene->mMeshes[node->mMeshes[i]];
             MeshComponent meshComponent = processMesh(mesh, aiScene);
             MaterialComponent materialComponent = processMaterial(aiScene->mMaterials[mesh->mMaterialIndex]);
 
-            UUID meshEntityUUID{};
+            auto meshEntity = scene.createEntity();
+            auto meshEntityUUID = scene.getEntityUUID(meshEntity).value();
             scene.addComponent<MeshComponent>(meshEntityUUID, std::move(meshComponent));
             scene.addComponent<MaterialComponent>(meshEntityUUID, std::move(materialComponent));
+
+            // Extract translation, rotation, and scale from the nodeTransform
+            glm::vec3 translation;
+            glm::vec3 rotation;
+            glm::vec3 scale;
+            glm::quat orientation;
+            glm::vec3 skew;
+            glm::vec4 perspective;
+            glm::decompose(nodeTransform, scale, orientation, translation, skew, perspective);
+            rotation = glm::eulerAngles(orientation);
+
+            // Create TransformComponent with the applied transformation
+            scene.addComponent<TransformComponent>(meshEntityUUID, TransformComponent{
+                    translation,
+                    rotation,
+                    scale // Scale down the model
+            });
 
             auto& modelComponent = scene.getComponent<ModelComponent>(modelEntityUUID);
             modelComponent.meshEntities.push_back(meshEntityUUID);
         }
 
         for (unsigned int i = 0; i < node->mNumChildren; i++) {
-            processNode(scene, node->mChildren[i], aiScene, modelEntityUUID, depth + 1);
+            processNode(scene, node->mChildren[i], aiScene, modelEntityUUID, nodeTransform);
         }
     }
 
     MeshComponent MeshLoadingSystem::processMesh(const aiMesh* mesh, const aiScene* scene) {
         MeshComponent meshComponent;
 
-        std::cout << "Processing mesh: " << mesh->mName.C_Str()
-                  << ", Vertices: " << mesh->mNumVertices
-                  << ", Faces: " << mesh->mNumFaces << std::endl;
+        spdlog::info("Processing mesh: {}, Vertices: {}, Faces: {}",
+                     mesh->mName.C_Str(), mesh->mNumVertices, mesh->mNumFaces);
 
-        // Process vertices
+        meshComponent.vertices.reserve(mesh->mNumVertices);
         for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
             Vertex vertex{};
             vertex.Position = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
@@ -75,16 +101,15 @@ namespace s3Dive {
             meshComponent.vertices.push_back(vertex);
         }
 
-        // Process indices
+        meshComponent.indices.reserve(mesh->mNumFaces * 3);
         for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
-            aiFace face = mesh->mFaces[i];
+            const aiFace& face = mesh->mFaces[i];
             for (unsigned int j = 0; j < face.mNumIndices; j++) {
                 meshComponent.indices.push_back(face.mIndices[j]);
             }
         }
 
-        // Initialize mesh
-        meshComponent.initialize();
+        initializeMeshComponent(meshComponent);
 
         return meshComponent;
     }
@@ -112,9 +137,37 @@ namespace s3Dive {
         if (mat->GetTextureCount(type) > 0) {
             aiString str;
             mat->GetTexture(type, 0, &str);
-            std::string texturePath = "" + std::string(str.C_Str());
+            std::string texturePath = str.C_Str();
             return std::make_shared<GLTexture>(texturePath);
         }
         return std::make_shared<GLTexture>("wall.jpg");
     }
-} // s3Dive
+
+    void MeshLoadingSystem::initializeMeshComponent(MeshComponent& meshComponent) {
+        std::vector<float> vertexData;
+        vertexData.reserve(meshComponent.vertices.size() * 8);
+        for (const auto& vertex : meshComponent.vertices) {
+            vertexData.insert(vertexData.end(), {
+                    vertex.Position.x, vertex.Position.y, vertex.Position.z,
+                    vertex.Normal.x, vertex.Normal.y, vertex.Normal.z,
+                    vertex.TexCoords.x, vertex.TexCoords.y
+            });
+        }
+
+        auto vertexBuffer = std::make_shared<GLVertexBuffer>(vertexData);
+        GLVertexBufferLayout layout;
+        layout.addVertexElement<float>(3); // Position
+        layout.addVertexElement<float>(3); // Normal
+        layout.addVertexElement<float>(2); // TexCoords
+        vertexBuffer->setLayout(layout);
+
+        meshComponent.vertexArray = std::make_shared<GLVertexArray>();
+        meshComponent.vertexArray->addVertexBuffer(vertexBuffer);
+
+        auto indexBuffer = std::make_shared<GLIndexBuffer>(meshComponent.indices);
+        meshComponent.vertexArray->setIndexBuffer(indexBuffer);
+
+        meshComponent.isInitialized = true;
+    }
+
+} // namespace s3Dive

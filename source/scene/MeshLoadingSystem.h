@@ -20,12 +20,14 @@ namespace s3Dive {
         void loadModel(Scene& scene, const UUID& modelEntityUUID);
 
     private:
-        void processNode(Scene& scene, const aiNode* node, const aiScene* aiScene, const UUID& modelEntityUUID, int depth = 0);
         MeshComponent processMesh(const aiMesh* mesh, const aiScene* scene);
         MaterialComponent processMaterial(const aiMaterial* material);
         static std::shared_ptr<GLTexture> loadMaterialTexture(const aiMaterial* mat, aiTextureType type);
+        static void initializeMeshComponent(MeshComponent& meshComponent);
+
+        void processNode(Scene &scene, const aiNode *node, const aiScene *aiScene, const UUID &modelEntityUUID,glm::mat4 parentTransform);
     };
 
-} // s3Dive
+} // namespace s3Dive
 
 #endif //THREEDIVE_MESHLOADINGSYSTEM_H
