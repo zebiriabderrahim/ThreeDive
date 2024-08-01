@@ -1,8 +1,10 @@
 #include "RenderSystem.h"
 #include "components.h"
 #include "../renderer/RenderCommand.h"
+#include <glm/gtc/type_ptr.hpp>
 
 namespace s3Dive {
+
     void RenderSystem::render(Scene& scene, GLShaderProgram& shaderProgram, const CameraController& cameraController) {
         shaderProgram.use();
 
@@ -17,16 +19,17 @@ namespace s3Dive {
         const auto& camera = cameraController.getCamera();
         shaderProgram.updateShaderUniform("viewPos", cameraController.getDistanceToTarget());
 
-        auto view = scene.view<MeshComponent, MaterialComponent>();
+        auto view = scene.view<TransformComponent, MeshComponent, MaterialComponent>();
         for (auto entity : view) {
-            const auto& [mesh, material] = view.get<MeshComponent, MaterialComponent>(entity);
+            const auto& [transform, mesh, material] = view.get<TransformComponent, MeshComponent, MaterialComponent>(entity);
 
             if (!mesh.isInitialized || !mesh.vertexArray) {
                 continue;
             }
 
-            // Set model matrix (assuming you have a TransformComponent)
-            glm::mat4 model = glm::mat4(1.0f); // Replace with actual model matrix if available
+            // Set model matrix using the TransformComponent's transformation matrix
+            glm::mat4 model = transform.GetTransform();
+
             glm::mat4 projectionMatrix = camera.getProjectionMatrix();
             glm::mat4 viewMatrix = camera.getViewMatrix();
 
@@ -41,9 +44,6 @@ namespace s3Dive {
 
         shaderProgram.unuse();
     }
-
-
-
 
     void RenderSystem::setupLights(Scene& scene, GLShaderProgram& shaderProgram) const {
         int lightCount = 0;
@@ -64,4 +64,4 @@ namespace s3Dive {
         shaderProgram.updateShaderUniform("numLights", lightCount);
     }
 
-} // s3Dive
+} // namespace s3Dive
