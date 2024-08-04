@@ -6,6 +6,12 @@
 #define THREEDIVE_COMPONENTS_H
 
 #include <string>
+#include <vector>
+#include <memory>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include "../core/geo_generator.h"
 #include "../core/uuid.h"
 #include "../platform/openGLRender/gl_texture.h"
@@ -14,11 +20,23 @@
 namespace s3Dive {
 
     struct TransformComponent {
-        glm::vec3 position{0.0f, 0.0f, 0.0f};
-        glm::vec3 rotation{0.0f, 0.0f, 0.0f};
-        glm::vec3 scale{1.0f, 1.0f, 1.0f};
+        glm::vec3 Translation{0.0f, 0.0f, 0.0f};
+        glm::vec3 Rotation{0.0f, 0.0f, 0.0f};
+        glm::vec3 Scale{1.0f, 1.0f, 1.0f};
+
+        TransformComponent() = default;
+        TransformComponent(const glm::vec3& translation, const glm::vec3& rotation, const glm::vec3& scale)
+                : Translation(translation), Rotation(rotation), Scale(scale) {}
+
+        glm::mat4 GetTransform() const {
+            glm::mat4 rotation = glm::toMat4(glm::quat(Rotation));
+            return glm::translate(glm::mat4(1.0f), Translation)
+                   * rotation
+                   * glm::scale(glm::mat4(1.0f), Scale);
+        }
     };
-    // MaterialComponent.h
+
+
     struct MaterialComponent {
         glm::vec3 albedo = glm::vec3(0.435f, 0.435f, 0.435f);
         float metallic = 0.1f;
@@ -27,7 +45,6 @@ namespace s3Dive {
         std::shared_ptr<GLTexture> diffuseTexture;
     };
 
-// LightComponent.h
     enum class LightType {
         Directional,
         Point,
@@ -55,39 +72,6 @@ namespace s3Dive {
         std::vector<unsigned int> indices;
         std::shared_ptr<GLVertexArray> vertexArray;
         bool isInitialized = false;
-
-        void initialize() {
-            // Convert Vertex struct to a flat array of floats
-            std::vector<float> vertexData;
-            for (const auto &vertex: vertices) {
-                vertexData.push_back(vertex.Position.x);
-                vertexData.push_back(vertex.Position.y);
-                vertexData.push_back(vertex.Position.z);
-                vertexData.push_back(vertex.Normal.x);
-                vertexData.push_back(vertex.Normal.y);
-                vertexData.push_back(vertex.Normal.z);
-                vertexData.push_back(vertex.TexCoords.x);
-                vertexData.push_back(vertex.TexCoords.y);
-            }
-
-            // Create and set up the vertex buffer
-            auto vertexBuffer = std::make_shared<GLVertexBuffer>(vertexData);
-            GLVertexBufferLayout layout;
-            layout.addVertexElement<float>(3); // Position
-            layout.addVertexElement<float>(3); // Normal
-            layout.addVertexElement<float>(2); // TexCoords
-            vertexBuffer->setLayout(layout);
-
-            // Create and set up the vertex array
-            vertexArray = std::make_shared<GLVertexArray>();
-            vertexArray->addVertexBuffer(vertexBuffer);
-
-            // Set up the index buffer
-            auto indexBuffer = std::make_shared<GLIndexBuffer>(indices);
-            vertexArray->setIndexBuffer(indexBuffer);
-
-            isInitialized = true;
-        }
     };
 
     struct ModelComponent {
@@ -108,7 +92,6 @@ namespace s3Dive {
                 vertices(geo::generateDetailedGridVertices(size_, step_, extensionSize_, fadeSteps_)) {}
     };
 
-
-} // s3Dive
+} // namespace s3Dive
 
 #endif //THREEDIVE_COMPONENTS_H

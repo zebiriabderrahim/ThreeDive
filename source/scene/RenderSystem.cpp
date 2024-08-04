@@ -12,56 +12,55 @@ namespace s3Dive {
         shaderProgram.updateShaderUniform("lightColor", glm::vec3(1.0f, 1.0f, 1.0f)); // White light
         shaderProgram.updateShaderUniform("ambientStrength", 0.7f); // Stronger ambient for more uniform lighting
 
-        // Set default material properties
-        shaderProgram.updateShaderUniform("albedo", glm::vec3(0.435f, 0.435f, 0.435f)); // Neutral gray
-
         // Set view position (camera position)
         const auto& camera = cameraController.getCamera();
         shaderProgram.updateShaderUniform("viewPos", cameraController.getDistanceToTarget());
 
-        auto view = scene.view<TransformComponent, MeshComponent, MaterialComponent>();
-        for (auto entity : view) {
-            const auto& [transform, mesh, material] = view.get<TransformComponent, MeshComponent, MaterialComponent>(entity);
+        glm::mat4 projectionMatrix = camera.getProjectionMatrix();
+        glm::mat4 viewMatrix = camera.getViewMatrix();
+        shaderProgram.updateShaderUniform("view", glm::value_ptr(viewMatrix));
+        shaderProgram.updateShaderUniform("projection", glm::value_ptr(projectionMatrix));
 
-            if (!mesh.isInitialized || !mesh.vertexArray) {
-                continue;
+        // Iterate through all entities with a ModelComponent
+        auto modelView = scene.view<ModelComponent>();
+        for (auto modelEntity : modelView) {
+            const auto& modelComponent = modelView.get<ModelComponent>(modelEntity);
+
+            // Render each mesh entity associated with the model
+            for (const auto& meshEntityUUID : modelComponent.meshEntities) {
+                if (!scene.hasComponent<TransformComponent>(meshEntityUUID) ||
+                    !scene.hasComponent<MeshComponent>(meshEntityUUID) ||
+                    !scene.hasComponent<MaterialComponent>(meshEntityUUID)) {
+                    continue;
+                }
+
+                const auto& transform = scene.getComponent<TransformComponent>(meshEntityUUID);
+                const auto& mesh = scene.getComponent<MeshComponent>(meshEntityUUID);
+                const auto& material = scene.getComponent<MaterialComponent>(meshEntityUUID);
+
+                if (!mesh.isInitialized || !mesh.vertexArray) {
+                    continue;
+                }
+
+                // Set model matrix using the TransformComponent's transformation matrix
+                glm::mat4 model = transform.GetTransform();
+                shaderProgram.updateShaderUniform("model", glm::value_ptr(model));
+                shaderProgram.updateShaderUniform("albedo", material.albedo);
+//                shaderProgram.updateShaderUniform("metallic", material.metallic);
+//                shaderProgram.updateShaderUniform("roughness", material.roughness);
+
+                if (material.diffuseTexture) {
+                    material.diffuseTexture->bind(0);
+                    shaderProgram.updateShaderUniform("material.diffuseTexture", 0);
+                }
+
+                mesh.vertexArray->bind();
+                RenderCommand::drawIndexed(*mesh.vertexArray, static_cast<GLint>(mesh.indices.size()));
+                mesh.vertexArray->unbind();
             }
-
-            // Set model matrix using the TransformComponent's transformation matrix
-            glm::mat4 model = transform.GetTransform();
-
-            glm::mat4 projectionMatrix = camera.getProjectionMatrix();
-            glm::mat4 viewMatrix = camera.getViewMatrix();
-
-            shaderProgram.updateShaderUniform("model", glm::value_ptr(model));
-            shaderProgram.updateShaderUniform("view", glm::value_ptr(viewMatrix));
-            shaderProgram.updateShaderUniform("projection", glm::value_ptr(projectionMatrix));
-
-            mesh.vertexArray->bind();
-            RenderCommand::drawIndexed(*mesh.vertexArray, static_cast<GLint>(mesh.indices.size()));
-            mesh.vertexArray->unbind();
         }
 
         shaderProgram.unuse();
-    }
-
-    void RenderSystem::setupLights(Scene& scene, GLShaderProgram& shaderProgram) const {
-        int lightCount = 0;
-
-        auto lightView = scene.view<LightComponent>();
-        for (auto entity : lightView) {
-            const auto& light = lightView.get<LightComponent>(entity);
-            lightCount++;
-            std::string lightName = "lights[" + std::to_string(lightCount) + "]";
-
-            shaderProgram.updateShaderUniform(lightName + ".position", light.position);
-            shaderProgram.updateShaderUniform(lightName + ".color", light.color);
-            shaderProgram.updateShaderUniform(lightName + ".intensity", light.intensity);
-
-            if (lightCount >= 4) break;  // Limit to 4 lights for simplicity
-        }
-
-        shaderProgram.updateShaderUniform("numLights", lightCount);
     }
 
 } // namespace s3Dive

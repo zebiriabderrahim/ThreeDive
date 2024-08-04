@@ -7,10 +7,9 @@
 
 namespace s3Dive {
 
-    void MeshLoadingSystem::loadModel(Scene& scene, const UUID& modelEntityUUID) {
-        const auto& modelComponent = scene.getComponent<ModelComponent>(modelEntityUUID);
+    void ModelLoadingSystem::loadModel(Scene& scene, const std::string& filepath) {
 
-        spdlog::info("Loading model: {}", modelComponent.filepath);
+        spdlog::info("Loading model: {}", filepath);
 
         Assimp::Importer importer;
         constexpr unsigned int importFlags =
@@ -21,29 +20,42 @@ namespace s3Dive {
                 aiProcess_JoinIdenticalVertices |
                 aiProcess_SortByPType;
 
-        const aiScene* aiScene = importer.ReadFile(modelComponent.filepath, importFlags);
+        const aiScene* aiScene = importer.ReadFile(filepath, importFlags);
 
         if (!aiScene || aiScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !aiScene->mRootNode) {
-            throw std::runtime_error(fmt::format("ERROR::ASSIMP::{}", importer.GetErrorString()));
+//            throw std::runtime_error(fmt::format("ERROR::ASSIMP::{}", importer.GetErrorString()));
+            return;
         }
 
         spdlog::info("Meshes in scene: {}", aiScene->mNumMeshes);
         spdlog::info("Root node children: {}", aiScene->mRootNode->mNumChildren);
 
+        auto modelEntity = scene.createEntity();
+        auto modelEntityUUID = scene.getEntityUUID(modelEntity).value();
+        scene.addComponent<ModelComponent>(modelEntityUUID);
+
         processNode(scene, aiScene->mRootNode, aiScene, modelEntityUUID, glm::mat4(1.0f));
     }
 
-    void MeshLoadingSystem::processNode(Scene& scene, const aiNode* node, const aiScene* aiScene,
-                                        const UUID& modelEntityUUID, glm::mat4 parentTransform) {
+    void ModelLoadingSystem::processNode(Scene& scene, const aiNode* node, const aiScene* aiScene,
+                                         const UUID& modelEntityUUID, const glm::mat4& parentTransform) {
         // Extract the transformation matrix from the node and combine it with the parent transform
         aiMatrix4x4 aiTransform = node->mTransformation;
         aiTransform.Transpose(); // Assimp uses row-major matrices, we need column-major for glm
 
         glm::mat4 nodeTransform = parentTransform * glm::make_mat4(&aiTransform.a1);
 
+        // Apply scaling only at the root node
+        if (node == aiScene->mRootNode) {
+            // Apply scaling
+            nodeTransform = glm::scale(nodeTransform, glm::vec3(0.01f));
+            nodeTransform = glm::rotate(nodeTransform, glm::radians(+90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+            auto translationAdjustment = glm::vec3(0.0f, 0.0f, 0.0f); // Adjust as needed
+            nodeTransform = glm::translate(nodeTransform, translationAdjustment);
+        }
         for (unsigned int i = 0; i < node->mNumMeshes; i++) {
             const aiMesh* mesh = aiScene->mMeshes[node->mMeshes[i]];
-            MeshComponent meshComponent = processMesh(mesh, aiScene);
+            MeshComponent meshComponent = processMesh(mesh);
             MaterialComponent materialComponent = processMaterial(aiScene->mMaterials[mesh->mMaterialIndex]);
 
             auto meshEntity = scene.createEntity();
@@ -76,8 +88,7 @@ namespace s3Dive {
             processNode(scene, node->mChildren[i], aiScene, modelEntityUUID, nodeTransform);
         }
     }
-
-    MeshComponent MeshLoadingSystem::processMesh(const aiMesh* mesh, const aiScene* scene) {
+    MeshComponent ModelLoadingSystem::processMesh(const aiMesh* mesh) {
         MeshComponent meshComponent;
 
         spdlog::info("Processing mesh: {}, Vertices: {}, Faces: {}",
@@ -114,7 +125,7 @@ namespace s3Dive {
         return meshComponent;
     }
 
-    MaterialComponent MeshLoadingSystem::processMaterial(const aiMaterial* material) {
+    MaterialComponent ModelLoadingSystem::processMaterial(const aiMaterial* material) const {
         MaterialComponent materialComponent;
 
         aiColor3D color;
@@ -133,7 +144,7 @@ namespace s3Dive {
         return materialComponent;
     }
 
-    std::shared_ptr<GLTexture> MeshLoadingSystem::loadMaterialTexture(const aiMaterial* mat, aiTextureType type) {
+    std::shared_ptr<GLTexture> ModelLoadingSystem::loadMaterialTexture(const aiMaterial* mat, aiTextureType type) {
         if (mat->GetTextureCount(type) > 0) {
             aiString str;
             mat->GetTexture(type, 0, &str);
@@ -143,7 +154,7 @@ namespace s3Dive {
         return std::make_shared<GLTexture>("wall.jpg");
     }
 
-    void MeshLoadingSystem::initializeMeshComponent(MeshComponent& meshComponent) {
+    void ModelLoadingSystem::initializeMeshComponent(MeshComponent& meshComponent) {
         std::vector<float> vertexData;
         vertexData.reserve(meshComponent.vertices.size() * 8);
         for (const auto& vertex : meshComponent.vertices) {
