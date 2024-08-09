@@ -21,7 +21,7 @@ namespace s3Dive {
         }
     }
 
-    entt::entity Scene::getEntity(const UUID& uuid) const {
+    entt::entity Scene::getEntity(const UUID& uuid) const noexcept {
         auto it = entitiesMap_.find(uuid);
         return (it != entitiesMap_.end()) ? it->second : entt::null;
     }

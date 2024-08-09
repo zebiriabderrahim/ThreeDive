@@ -2,51 +2,38 @@
 
 out vec4 FragColor;
 
+in vec2 TexCoord;
 in vec3 FragPos;
 in vec3 Normal;
-in vec2 TexCoords;
-in vec3 VertexColor;
 
-uniform vec3 lightPos;
-uniform vec3 viewPos;
+uniform float viewPos;
 uniform vec3 lightColor;
-uniform vec3 objectColor;
-uniform float specularStrength;
-uniform bool useTexture;
-uniform bool useVertexColor;
-uniform bool isWireframe;
-uniform sampler2D texture_diffuse1;
+uniform float ambientStrength;
+uniform vec3 albedo;
 
 void main()
 {
-	// Ambient
-	float ambientStrength = 0.1;
+	// Normalize the normal vector
+	vec3 norm = normalize(Normal);
+
+	// Calculate view direction
+	vec3 viewDir = normalize(viewPos - FragPos);
+
+	// Ambient lighting
 	vec3 ambient = ambientStrength * lightColor;
 
-	// Diffuse
-	vec3 norm = normalize(Normal);
-	vec3 lightDir = normalize(lightPos - FragPos);
-	float diff = max(dot(norm, lightDir), 0.0);
+	// Soft diffuse lighting
+	float diff = max(dot(norm, vec3(0.0, 1.0, 0.0)), 0.0) * 0.5 + 0.5;
 	vec3 diffuse = diff * lightColor;
 
-	// Specular
-	vec3 viewDir = normalize(viewPos - FragPos);
-	vec3 reflectDir = reflect(-lightDir, norm);
-	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
-	vec3 specular = specularStrength * spec * lightColor;
+	// Combine results
+	vec3 result = (ambient + diffuse) * albedo;
 
-	vec3 result;
-	if (useTexture) {
-		result = (ambient + diffuse + specular) * texture(texture_diffuse1, TexCoords).rgb;
-	} else if (useVertexColor) {
-		result = (ambient + diffuse + specular) * VertexColor;
-	} else {
-		result = (ambient + diffuse + specular) * objectColor;
-	}
+	// Apply simple tone mapping
+	result = result / (result + vec3(1.0));
 
-	if (isWireframe) {
-		FragColor = vec4(0.0, 0.0, 0.0, 1.0); // Black wireframe
-	} else {
-		FragColor = vec4(result, 1.0);
-	}
+	// Apply gamma correction
+	result = pow(result, vec3(1.0/2.2));
+
+	FragColor = vec4(result, 1.0);
 }

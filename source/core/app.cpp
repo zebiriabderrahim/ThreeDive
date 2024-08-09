@@ -39,11 +39,14 @@ namespace s3Dive {
         glEnable(GL_DEPTH_TEST);
 
         gridShader_.initFromFiles("grid.vert", "grid.frag");
-        shader_.initFromFiles("simple-shader.vs.glsl", "simple-shader.fs.glsl");
+        defaultShaderProgram_.initFromFiles("simple-shader.vs.glsl", "simple-shader.fs.glsl");
 
         UUID modelEntityUUID {};
-        scene_.addComponent<ModelComponent>(modelEntityUUID, ModelComponent{"cube.fbx", {}});
+        scene_.addComponent<ModelComponent>(modelEntityUUID, ModelComponent{"k2.fbx", {}});
         meshLoadingSystem_.loadModel(scene_, modelEntityUUID);
+        // Create default lights
+        //createDefaultLights();
+
 
         return true;
     }
@@ -52,13 +55,8 @@ namespace s3Dive {
         while (!glfwWindowShouldClose(window_->getNativeWindow())) {
             window_->onUpdate();
             cameraController_.update();
-
-//            // Update systems
-//            for (auto& system : systems_) {
-//                system->update(scene_, window_->getDeltaTime());
-//            }
             systems_.update(scene_, 0);
-            meshLoadingSystem_.update(scene_, 0);
+            defaultRenderSystem.update(scene_, 0);
 
             onRender();
         }
@@ -82,27 +80,7 @@ namespace s3Dive {
         // Render grid
         systems_.render(scene_, gridShader_, cameraController_);
 
-        // Set uniforms for model shader
-        shader_.use();
-        shader_.updateShaderUniform("model", glm::value_ptr(model));
-        shader_.updateShaderUniform("view", glm::value_ptr(view));
-        shader_.updateShaderUniform("projection", glm::value_ptr(projection));
-
-        // Set default material properties
-        shader_.updateShaderUniform("objectColor", glm::vec3(0.8f, 0.8f, 0.8f));
-        shader_.updateShaderUniform("specularStrength", 0.5f);
-
-        // Set lighting properties
-        shader_.updateShaderUniform("lightPos", glm::vec3(10.0f, 10.0f, 10.0f));
-        shader_.updateShaderUniform("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-
-        // Set other uniforms
-        shader_.updateShaderUniform("useVertexColor", false); // Set to true if using vertex colors
-        shader_.updateShaderUniform("isWireframe", false); // Set to true for wireframe mode
-
-
-        // Render models
-        MeshLoadingSystem::render(scene_, shader_);
+        defaultRenderSystem.render(scene_, defaultShaderProgram_, cameraController_);
     }
 
 
@@ -117,5 +95,35 @@ namespace s3Dive {
         //systems_.push_back(std::make_unique<SceneGridSystem>());
         // Add other systems as needed
     }
+
+    void App::createDefaultLights() {
+        // Key light
+        UUID keyLightUUID{};
+        LightComponent keyLight;
+        keyLight.type = LightType::Directional;
+        keyLight.direction = glm::normalize(glm::vec3(1.0f, -1.0f, -1.0f));
+        keyLight.color = glm::vec3(1.0f, 1.0f, 0.9f);
+        keyLight.intensity = 1.0f;
+        scene_.addComponent<LightComponent>(keyLightUUID, keyLight);
+
+        // Fill light
+        UUID fillLightUUID{};
+        LightComponent fillLight;
+        fillLight.type = LightType::Directional;
+        fillLight.direction = glm::normalize(glm::vec3(-1.0f, -0.5f, 0.5f));
+        fillLight.color = glm::vec3(0.7f, 0.7f, 0.8f);
+        fillLight.intensity = 0.5f;
+        scene_.addComponent<LightComponent>(fillLightUUID, fillLight);
+
+        // Back light
+        UUID backLightUUID{};
+        LightComponent backLight;
+        backLight.type = LightType::Directional;
+        backLight.direction = glm::normalize(glm::vec3(0.0f, 1.0f, 1.0f));
+        backLight.color = glm::vec3(0.9f, 0.9f, 1.0f);
+        backLight.intensity = 0.3f;
+        scene_.addComponent<LightComponent>(backLightUUID, backLight);
+    }
+
 
 } // namespace s3Dive

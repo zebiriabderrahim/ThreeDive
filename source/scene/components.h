@@ -6,6 +6,12 @@
 #define THREEDIVE_COMPONENTS_H
 
 #include <string>
+#include <vector>
+#include <memory>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include "../core/geo_generator.h"
 #include "../core/uuid.h"
 #include "../platform/openGLRender/gl_texture.h"
@@ -14,9 +20,45 @@
 namespace s3Dive {
 
     struct TransformComponent {
-        glm::vec3 position{0.0f, 0.0f, 0.0f};
-        glm::vec3 rotation{0.0f, 0.0f, 0.0f};
-        glm::vec3 scale{1.0f, 1.0f, 1.0f};
+        glm::vec3 Translation{0.0f, 0.0f, 0.0f};
+        glm::vec3 Rotation{0.0f, 0.0f, 0.0f};
+        glm::vec3 Scale{1.0f, 1.0f, 1.0f};
+
+        TransformComponent() = default;
+        TransformComponent(const glm::vec3& translation, const glm::vec3& rotation, const glm::vec3& scale)
+                : Translation(translation), Rotation(rotation), Scale(scale) {}
+
+        glm::mat4 GetTransform() const {
+            glm::mat4 rotation = glm::toMat4(glm::quat(Rotation));
+            return glm::translate(glm::mat4(1.0f), Translation)
+                   * rotation
+                   * glm::scale(glm::mat4(1.0f), Scale);
+        }
+    };
+
+
+    struct MaterialComponent {
+        glm::vec3 albedo = glm::vec3(0.435f, 0.435f, 0.435f);
+        float metallic = 0.1f;
+        float roughness = 0.5f;
+        float ao = 1.0f;
+        std::shared_ptr<GLTexture> diffuseTexture;
+    };
+
+    enum class LightType {
+        Directional,
+        Point,
+        Spot
+    };
+
+    struct LightComponent {
+        LightType type = LightType::Point;
+        glm::vec3 position = glm::vec3(0.0f);
+        glm::vec3 direction = glm::vec3(0.0f, -1.0f, 0.0f);
+        glm::vec3 color = glm::vec3(1.0f);
+        float intensity = 1.0f;
+        float range = 10.0f;  // For point and spot lights
+        float spotAngle = 45.0f;  // For spot lights
     };
 
     struct Vertex {
@@ -28,11 +70,10 @@ namespace s3Dive {
     struct MeshComponent {
         std::vector<Vertex> vertices;
         std::vector<unsigned int> indices;
-        std::shared_ptr<GLVertexBuffer> vertexBuffer;
         std::shared_ptr<GLVertexArray> vertexArray;
-        std::shared_ptr<GLTexture> texture;
         bool isInitialized = false;
     };
+
     struct ModelComponent {
         std::string filepath;
         std::vector<s3Dive::UUID> meshEntities;  // UUIDs of associated mesh entities
@@ -51,7 +92,6 @@ namespace s3Dive {
                 vertices(geo::generateDetailedGridVertices(size_, step_, extensionSize_, fadeSteps_)) {}
     };
 
-
-} // s3Dive
+} // namespace s3Dive
 
 #endif //THREEDIVE_COMPONENTS_H

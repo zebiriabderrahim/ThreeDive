@@ -9,6 +9,7 @@
 #include "../scene/sceneGridSystem.h"
 #include "window.h"
 #include "../scene/MeshLoadingSystem.h"
+#include "../scene/RenderSystem.h"
 #include <memory>
 #include <vector>
 
@@ -26,19 +27,22 @@ namespace s3Dive {
         std::shared_ptr<Window> window_;
         CameraController cameraController_{};
         GLShaderProgram gridShader_;
-        GLShaderProgram shader_;
+        GLShaderProgram defaultShaderProgram_;
         GLVertexArray vao_;
         std::shared_ptr<GLVertexBuffer> vbo_;
         std::vector<float> gridVertices_;
 
         Scene scene_;
         SceneGridSystem systems_;
+        RenderSystem defaultRenderSystem;
         MeshLoadingSystem meshLoadingSystem_;
 
 
         void onRender();
         void initializeGrid();
         void initializeSystems();
+
+        void createDefaultLights();
     };
 
 } // namespace s3Dive

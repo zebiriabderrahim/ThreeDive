@@ -2,6 +2,7 @@
 #define THREEDIVE_SCENE_H
 
 #include <unordered_map>
+#include <optional>
 #include <entt/entity/registry.hpp>
 #include "../core/uuid.h"
 
@@ -19,58 +20,67 @@ namespace s3Dive {
         Scene(Scene&&) noexcept = default;
         Scene& operator=(Scene&&) noexcept = default;
 
-        entt::registry& getRegistry() { return registry_; }
-        [[nodiscard]] const entt::registry& getRegistry() const { return registry_; }
-        [[nodiscard]] const EntityMap& getEntities() const { return entitiesMap_; }
+        [[nodiscard]] entt::registry& getRegistry() noexcept { return registry_; }
+        [[nodiscard]] const entt::registry& getRegistry() const noexcept { return registry_; }
+        [[nodiscard]] const EntityMap& getEntities() const noexcept { return entitiesMap_; }
 
-        entt::entity createEntity();
+        [[nodiscard]] entt::entity createEntity();
         void destroyEntity(const UUID& uuid);
 
-        [[nodiscard]] entt::entity getEntity(const UUID& uuid) const;
+        [[nodiscard]] entt::entity getEntity(const UUID& uuid) const noexcept;
         [[nodiscard]] std::optional<UUID> getEntityUUID(entt::entity entity) const;
 
         template<typename T, typename... Args>
         T& addComponent(const UUID& uuid, Args&&... args) {
             auto entity = getEntity(uuid);
-            if (registry_.all_of<T>(entity)) {
-                std::cout << "Component already exists for entity: " << uuid << std::endl;
+            if (entity == entt::null) {
+                throw std::runtime_error("Entity not found");
+            }
+            if (hasComponent<T>(uuid)) {
                 return registry_.get<T>(entity);
             }
-            std::cout << "Adding component to entity: " << uuid << std::endl;
             return registry_.emplace<T>(entity, std::forward<Args>(args)...);
         }
 
         template<typename T>
         void removeComponent(const UUID& uuid) {
             auto entity = getEntity(uuid);
-            registry_.remove<T>(entity);
+            if (entity != entt::null) {
+                registry_.remove<T>(entity);
+            }
         }
 
         template<typename T>
-        T& getComponent(const UUID& uuid) {
+        [[nodiscard]] T& getComponent(const UUID& uuid) {
             auto entity = getEntity(uuid);
+            if (entity == entt::null) {
+                throw std::runtime_error("Entity not found");
+            }
             return registry_.get<T>(entity);
         }
 
         template<typename T>
-        const T& getComponent(const UUID& uuid) const {
+        [[nodiscard]] const T& getComponent(const UUID& uuid) const {
             auto entity = getEntity(uuid);
+            if (entity == entt::null) {
+                throw std::runtime_error("Entity not found");
+            }
             return registry_.get<T>(entity);
         }
 
         template<typename T>
-        [[nodiscard]] bool hasComponent(const UUID& uuid) const {
+        [[nodiscard]] bool hasComponent(const UUID& uuid) const noexcept {
             auto entity = getEntity(uuid);
-            return registry_.all_of<T>(entity);
+            return entity != entt::null && registry_.all_of<T>(entity);
         }
 
         template<typename... Components>
-        auto view() {
+        [[nodiscard]] auto view() {
             return registry_.view<Components...>();
         }
 
         template<typename... Components>
-        auto view() const {
+        [[nodiscard]] auto view() const {
             return registry_.view<Components...>();
         }
 
