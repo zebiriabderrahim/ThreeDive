@@ -35,7 +35,7 @@ namespace s3Dive {
         Scene scene_;
         SceneGridSystem systems_;
         RenderSystem defaultRenderSystem;
-        MeshLoadingSystem meshLoadingSystem_;
+        ModelLoadingSystem meshLoadingSystem_;
 
 
         void onRender();

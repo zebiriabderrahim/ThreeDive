@@ -3,7 +3,7 @@
 #include "../renderer/RenderCommand.h"
 #include "geo_generator.h"
 #include "window.h"
-#include "../scene/MeshLoadingSystem.h"
+#include <spdlog/spdlog.h>
 
 namespace s3Dive {
 
@@ -41,9 +41,13 @@ namespace s3Dive {
         gridShader_.initFromFiles("grid.vert", "grid.frag");
         defaultShaderProgram_.initFromFiles("simple-shader.vs.glsl", "simple-shader.fs.glsl");
 
-        UUID modelEntityUUID {};
-        scene_.addComponent<ModelComponent>(modelEntityUUID, ModelComponent{"k2.fbx", {}});
-        meshLoadingSystem_.loadModel(scene_, modelEntityUUID);
+        try {
+            meshLoadingSystem_.loadModel(scene_, "obj.fbx");
+                spdlog::info("Model added successfully with UUID: {}");
+        } catch (const std::exception& e) {
+            spdlog::error("Failed to add model: {}", e.what());
+            // Handle the error appropriately
+        }
         // Create default lights
         //createDefaultLights();
 
