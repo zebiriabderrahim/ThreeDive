@@ -70,10 +70,9 @@ add_executable(ThreeDive
         source/scene/entity.cpp
         source/scene/entity.h
         source/scene/system.h
-        source/scene/MeshLoadingSystem.cpp
-        source/scene/MeshLoadingSystem.h
         source/scene/RenderSystem.cpp
         source/scene/RenderSystem.h
+        source/scene/MeshLoadingSystem.cpp
 )
 
 add_custom_command(TARGET ThreeDive
@@ -83,7 +82,7 @@ add_custom_command(TARGET ThreeDive
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/assets/grid.vert $<TARGET_FILE_DIR:ThreeDive>
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/assets/grid.frag $<TARGET_FILE_DIR:ThreeDive>
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/assets/wall.jpg $<TARGET_FILE_DIR:ThreeDive>
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/assets/OS.obj $<TARGET_FILE_DIR:ThreeDive>
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/assets/obj.fbx $<TARGET_FILE_DIR:ThreeDive>
         )
 
 target_compile_definitions(ThreeDive PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW ENTT_INCLUDE_NATVIS)
